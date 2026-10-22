@@ -12,9 +12,26 @@ const SHELL_FILES = [
   'icons/icon-maskable-512.png',
   'icons/apple-touch-icon.png'
 ];
+// Same URL as the stylesheet link in index.html.
+const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Sora:wght@300;400;500;600&family=VT323&family=Space+Mono:wght@400;700&display=swap';
+
+// Cache the font stylesheet and every font file it points to, so both themes
+// have their fonts offline even if one was never opened online.
+async function precacheFonts() {
+  const cache = await caches.open(FONTS);
+  const res = await fetch(FONT_CSS);
+  if (!res.ok) return;
+  await cache.put(FONT_CSS, res.clone());
+  const urls = [...(await res.text()).matchAll(/url\((https:[^)]+)\)/g)].map(m => m[1]);
+  await Promise.all(urls.map(u => fetch(u).then(r => r.ok && cache.put(u, r)).catch(() => {})));
+}
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(SHELL).then(c => c.addAll(SHELL_FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(SHELL).then(c => c.addAll(SHELL_FILES))
+      .then(() => precacheFonts().catch(() => {}))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', e => {

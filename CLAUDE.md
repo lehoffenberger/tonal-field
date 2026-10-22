@@ -17,8 +17,7 @@ to my home screen as an installable PWA with offline support.
 - `sw.js` — service worker: caches the app shell and Google Fonts for offline use.
   **Bump `VERSION` in `sw.js` whenever `index.html` or the icons change**, or phones
   keep serving the old cached copy.
-- `head-snippet.html` — the tags `index.html` needs to link the manifest and register
-  the service worker (already applied once `index.html` is in the repo).
+- The manifest and service-worker tags live in `index.html` (`<head>` and just before `</body>`).
 
 ## Modes (tabs, beginner to advanced)
 1. Degrees: a drone/cadence sets the key, then one note plays; identify the scale
