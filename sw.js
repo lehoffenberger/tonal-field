@@ -1,6 +1,6 @@
 // Tonal Field service worker: offline app shell + cached Google Fonts.
 // Bump VERSION whenever index.html or the icons change so phones pick up the update.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL = `tf-shell-${VERSION}`;
 const FONTS = 'tf-fonts';
 const SHELL_FILES = [
