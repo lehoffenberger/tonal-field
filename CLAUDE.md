@@ -52,7 +52,10 @@ to my home screen as an installable PWA with offline support.
   Safari and the home-screen app have separate storage.
 - iOS: `navigator.audioSession.type='playback'` so sound ignores the silent switch; the
   AudioContext is resumed from any non-running state (calls, app switching).
-- Pocket mode: hands-free, speaks the answers using speech synthesis.
+- Pocket mode: hands-free, speaks the answers using speech synthesis. Starting it says
+  "Hands-free on" from the tap (iOS needs the first speech to come from a gesture). Each
+  answer is spoken, then (on speech end, with a timeout fallback) Web Audio is resumed,
+  since iOS pauses it while speaking, and the answer is played.
 - Free play: tap a chord or degree between questions to hear it.
 - Settings and stats are saved in localStorage (wrapped in try/catch).
 - Keyboard shortcuts for every mode, listed in the "?" help panel.

@@ -1211,36 +1211,56 @@ function setMode(m){
 }
 
 /* ================= Pocket mode ================= */
-function say(text){try{if(!('speechSynthesis' in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.95;speechSynthesis.speak(u);}catch(e){}}
+// Speak, then call done when speech ends (or after a timeout if the browser never says so).
+// The utterance is kept in a variable so it isn't garbage-collected mid-sentence.
+let utter=null;
+function say(text,done){
+  let fired=false;const fin=()=>{if(!fired){fired=true;done&&done();}};
+  try{
+    if(!('speechSynthesis' in window)){fin();return;}
+    const ss=speechSynthesis;if(ss.speaking||ss.pending)ss.cancel();
+    utter=new SpeechSynthesisUtterance(text);utter.rate=.95;utter.lang='en-US';utter.onend=fin;utter.onerror=fin;
+    try{ss.resume()}catch(e){}
+    ss.speak(utter);setTimeout(fin,Math.min(6000,1200+text.length*110));
+  }catch(e){fin();}
+}
+// iOS pauses Web Audio while it speaks; wake it before playing the answer
+function whenAudio(fn){ac();let done=false;const go=()=>{if(!done){done=true;fn();}};
+  if(ctx.state==='running')return go();try{ctx.resume().then(go,go);}catch(e){go();}setTimeout(go,700);}
 let wake=null;
 async function keepAwake(on){try{if(on){if(navigator.wakeLock&&!wake&&!document.hidden){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>{wake=null;});}}else if(wake){const w=wake;wake=null;await w.release();}}catch(e){wake=null;}}
+let pocketRun=0;
 function togglePocket(){
-  pocket=!pocket;const b=$('#btnPocket');if(b){b.textContent=pocket?'Stop':'Start';b.classList.toggle('on',pocket);}
-  // iOS only lets a page speak after a tap: say nothing now, so the timed answers later are allowed
-  if(pocket){try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}ac();pocketStep();}
+  pocket=!pocket;pocketRun++;const b=$('#btnPocket');if(b){b.textContent=pocket?'Stop':'Start';b.classList.toggle('on',pocket);}
+  // iOS only lets a page speak if the first words come straight from a tap, so say something real now
+  if(pocket){ac();const run=pocketRun;setPrompt('…');say('Hands-free on',()=>whenAudio(()=>{if(pocket&&run===pocketRun)pocketStep();}));}
   else{stopAll();try{speechSynthesis.cancel()}catch(e){}setPrompt('');}
   keepAwake(pocket);updateButtons();
+}
+// after thinking time: show and say the answer, then (once speech is done) play it
+function pocketReveal(wait,words,label,deg,playAnswer){
+  const run=pocketRun,live=()=>pocket&&run===pocketRun;
+  later(wait,()=>{if(!live())return;setIndicator(deg,true);showResult(label,true);
+    say(words,()=>{if(!live())return;whenAudio(()=>{if(!live())return;const len=playAnswer();later(len+1.4,()=>{if(live())pocketStep();});});});});
 }
 function pocketStep(){
   if(!pocket)return;$('#feedback').innerHTML='';setIndicator(null);
   if(S.mode==='intervals'){newInterval();setKeyName(DIRW[Q.dir]);renderNodes();
     const d=playInterval(Q.root,Q.second,Q.dir);setPrompt('…');
-    later(d+2.5,()=>{if(!pocket)return;say(INTSPK[Q.target]+(Q.dir==='down'?', down':''));setIndicator(Q.target*30,true);flashChip(Q.target);showResult(INT[Q.target],true);
-      later(.9,()=>{if(!pocket)return;const d2=playInterval(Q.root,Q.second,Q.dir);later(d2+1.4,pocketStep);});});
+    pocketReveal(d+2.5,INTSPK[Q.target]+(Q.dir==='down'?', down':''),INT[Q.target],Q.target*30,()=>playInterval(Q.root,Q.second,Q.dir));
   } else if(S.mode==='degrees'&&(S.notes||1)>1){newDegree();setKeyName(`${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}`);renderNodes();renderSlots();
     const d=playDegree(S.cadence);setPrompt('…');
-    later(d+3.5,()=>{if(!pocket)return;say(Q.items.map(it=>DEGSPK[it.pos]).join(', '));showResult(Q.items.map(it=>DEG[it.pos]).join(' '),true);
-      setIndicator(Q.items[Q.items.length-1].pos*30,true);const end=playDegreeSeq(now()+1.2);later(end-now()+1.6,pocketStep);});
+    pocketReveal(d+3.5,Q.items.map(it=>DEGSPK[it.pos]).join(', '),Q.items.map(it=>DEG[it.pos]).join(' '),Q.items[Q.items.length-1].pos*30,
+      ()=>{const t0=now()+.1,end=playDegreeSeq(t0);sounding(end-now());return end-now();});
   } else if(S.mode==='degrees'){newDegree();setKeyName(`${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}`);renderNodes();
     const d=playDegree(S.cadence);setPrompt('…');
-    later(d+3,()=>{if(!pocket)return;say(DEGSPK[Q.target]);setIndicator(Q.target*30,true);flashChip(Q.target);showResult(DEG[Q.target],true);
-      later(.8,()=>{if(!pocket)return;const b=bus();let t=now()+.05;const base=Q.midi-Q.target;resolvePath(Q.target,Q.ton).forEach((p,i,a)=>{const L=i===a.length-1?1:.4;tone(b,base+p,t,L,.14);t+=L;});later(t-now()+1.4,pocketStep);});});
+    pocketReveal(d+3,DEGSPK[Q.target],DEG[Q.target],Q.target*30,()=>{const b=bus();let t=now()+.1;const base=Q.midi-Q.target;
+      tone(b,Q.midi,t,.8,.15);t+=.9;resolvePath(Q.target,Q.ton).forEach((p,i,a)=>{const L=i===a.length-1?1:.4;tone(b,base+p,t,L,.14);t+=L;});sounding(t-now());return t-now();});
   } else {
     if(!newContext()){togglePocket();return;}setKeyName(`${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}`);renderNodes();renderSlots();
     const d=playContext(S.cadence);setPrompt('…');
-    later(d+3.5,()=>{if(!pocket)return;say(Q.items.map(i=>i.chord.spk).join(', '));showResult(Q.items.map(i=>i.chord.lab).join(' '),true);
-      setIndicator(Q.items[Q.items.length-1].chord.off*30,true);
-      const end=playVoicings(Q.vs,now()+.9,S.tempo);later(end-now()+1.6,pocketStep);});
+    pocketReveal(d+3.5,Q.items.map(i=>i.chord.spk).join(', '),Q.items.map(i=>i.chord.lab).join(' '),Q.items[Q.items.length-1].chord.off*30,
+      ()=>{const end=playVoicings(Q.vs,now()+.1,S.tempo);sounding(end-now());return end-now();});
   }
 }
 
