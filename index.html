@@ -18,7 +18,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Sora:wght@300;400;500;600&family=VT323&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* an app, not a page: no text selection or iOS callouts except where you type */
+.wrap{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,select,textarea{-webkit-user-select:text;user-select:text}
 body{height:100%;overflow:hidden}
 *,*::before,*::after{box-sizing:inherit}
 
@@ -27,33 +30,34 @@ body[data-skin="space"]{
   --fd:"Unbounded","Sora",system-ui,sans-serif; --fb:"Sora",system-ui,-apple-system,"Segoe UI",sans-serif; --fc:"Sora",system-ui,sans-serif;
   --bg:#EEF2FB; --ink:#0C1630; --muted:#5A6788; --faint:#B4BFDA; --line:rgba(12,22,48,.12);
   --blue:#2C5BE0; --orange:#E5661A; --orangeA:rgba(229,102,26,.25); --star:#3B5FCC;
-  --neb1:rgba(44,91,224,.14); --neb2:rgba(120,132,160,.12); --screen:#0C1630; --trace:#E5661A; --glow:#A8916E; --ring:#6E5C44; --core:rgba(150,128,96,.9); color-scheme:light;
+  --neb1:rgba(44,91,224,.14); --neb2:rgba(229,102,26,.10); --screen:#0C1630; --trace:#E5661A; --glow:#E5661A; --ring:#FFE2C2; --core:rgba(255,190,120,.95); color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body[data-skin="space"]{
   --bg:#02040B; --ink:#EAF0FF; --muted:#7C88A8; --faint:#2E3854; --line:rgba(150,170,230,.14);
   --blue:#74A4FF; --orange:#FF8A3D; --orangeA:rgba(255,138,61,.28); --star:#FFFFFF;
-  --neb1:rgba(40,80,200,.30); --neb2:rgba(120,132,170,.16); --glow:#F6E6CC; --ring:#FFF3E2; --core:rgba(255,244,228,.95); color-scheme:dark;}}
+  --neb1:rgba(40,80,200,.30); --neb2:rgba(255,120,40,.16); --glow:#FF8A3D; --ring:#FFE2C2; --core:rgba(255,190,120,.95); color-scheme:dark;}}
 :root[data-theme="dark"] body[data-skin="space"]{
   --bg:#02040B; --ink:#EAF0FF; --muted:#7C88A8; --faint:#2E3854; --line:rgba(150,170,230,.14);
   --blue:#74A4FF; --orange:#FF8A3D; --orangeA:rgba(255,138,61,.28); --star:#FFFFFF;
-  --neb1:rgba(40,80,200,.30); --neb2:rgba(120,132,170,.16); --glow:#F6E6CC; --ring:#FFF3E2; --core:rgba(255,244,228,.95); color-scheme:dark;}
+  --neb1:rgba(40,80,200,.30); --neb2:rgba(255,120,40,.16); --glow:#FF8A3D; --ring:#FFE2C2; --core:rgba(255,190,120,.95); color-scheme:dark;}
 
 /* ===== Pocket radio ===== */
 body[data-skin="radio"]{
   --fd:"VT323",ui-monospace,monospace; --fb:"Space Mono",ui-monospace,Menlo,monospace; --fc:"VT323",ui-monospace,monospace;
   --bg:#B9BEC0; --panel:#D8DBD9; --panel2:#C9CDCC; --ink:#1C2329; --muted:#56616A; --faint:#98A1A7; --line:rgba(28,35,41,.16);
-  --blue:#2F7FCF; --orange:#EE7418; --orangeA:transparent; --screen:#15314A; --trace:#9FD0FF; --lcd:#9FD0FF; color-scheme:light;
+  --blue:#2F7FCF; --orange:#EE7418; --orangeA:transparent; --screen:#15314A; --trace:#FF9B45; --lcd:#9FD0FF; color-scheme:light;
 }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body[data-skin="radio"] .chip{text-shadow:0 1px 0 rgba(0,0,0,.7),0 0 10px rgba(0,0,0,.35)}}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body[data-skin="radio"]{
   --bg:#0F1214; --panel:#1C2024; --panel2:#262B30; --ink:#E2E6E8; --muted:#8E99A1; --faint:#46505A; --line:rgba(226,230,232,.11);
-  --blue:#5AA6F0; --orange:#FF8A33; --screen:#0A1D2D; --trace:#8CC6FF; --lcd:#8CC6FF; color-scheme:dark;}}
+  --blue:#5AA6F0; --orange:#FF8A33; --screen:#0A1D2D; --trace:#FFA458; --lcd:#8CC6FF; color-scheme:dark;}}
 :root[data-theme="dark"] body[data-skin="radio"]{
   --bg:#0F1214; --panel:#1C2024; --panel2:#262B30; --ink:#E2E6E8; --muted:#8E99A1; --faint:#46505A; --line:rgba(226,230,232,.11);
-  --blue:#5AA6F0; --orange:#FF8A33; --screen:#0A1D2D; --trace:#8CC6FF; --lcd:#8CC6FF; color-scheme:dark;}
+  --blue:#5AA6F0; --orange:#FF8A33; --screen:#0A1D2D; --trace:#FFA458; --lcd:#8CC6FF; color-scheme:dark;}
 
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--fb);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
-button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:1.5px solid var(--muted);outline-offset:3px;border-radius:4px}
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:1.5px solid var(--orange);outline-offset:3px;border-radius:4px}
 
 /* background layers */
 #sky{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;display:none}
@@ -87,7 +91,7 @@ body[data-skin="radio"] .brand{font-size:24px;letter-spacing:.04em}
 .tabs button{position:relative;color:var(--muted);font-size:inherit;padding:10px 0;white-space:nowrap;transition:color .2s;flex:none}
 .tabs button:hover{color:var(--ink)}
 .tabs button[aria-selected="true"]{color:var(--ink)}
-.tabs button[aria-selected="true"]::after{content:"";position:absolute;left:50%;bottom:3px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--ink)}
+.tabs button[aria-selected="true"]::after{content:"";position:absolute;left:50%;bottom:3px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--orange)}
 body[data-skin="space"] .tabs button[aria-selected="true"]{text-shadow:0 0 14px color-mix(in oklab,var(--blue) 70%,transparent)}
 body[data-skin="radio"] .tabs{font-family:var(--fd);font-size:21px}
 .skin{display:flex;gap:14px;margin-left:auto}
@@ -104,7 +108,7 @@ body[data-skin="radio"] .score{font-family:var(--fd);font-size:18px}
 .stage{container-type:size;flex:1;min-width:0;min-height:460px;display:flex;flex-direction:column;align-items:center;justify-content:safe center;padding:2px 8px 10px;
   --res:226px;--fw:max(210px,min(460px,calc(100cqw - 16px),calc(100cqh - var(--res))))}
 body[data-mode="key"] .stage{--res:232px;--fw:max(210px,min(440px,calc(100cqw - 44px),calc(100cqh - var(--res))))}
-body[data-skin="radio"] .stage{--res:398px;--fw:max(200px,min(380px,calc(100cqw - 76px),calc(100cqh - var(--res))))}
+body[data-skin="radio"] .stage{--res:372px;--fw:max(200px,min(460px,calc(100cqw - 44px),calc(100cqh - var(--res))))}
 body[data-skin="radio"][data-mode="key"] .stage{--res:420px}
 body.focusing .stage{--res:250px}body.focusing[data-skin="radio"] .stage{--res:420px}
 .device{display:flex;flex-direction:column;align-items:center;max-width:100%}
@@ -112,7 +116,7 @@ body[data-skin="space"] .device{height:100%;width:100%}
 body[data-skin="space"] .field{margin-top:auto;margin-bottom:auto}
 
 /* radio device */
-body[data-skin="radio"] .device{width:calc(var(--fw) + 76px);max-width:100%;border-radius:30px;padding:14px 18px 0;overflow:hidden;
+body[data-skin="radio"] .device{width:calc(var(--fw) + 36px);max-width:100%;border-radius:30px;padding:14px 18px 0;overflow:hidden;
   background:linear-gradient(180deg,color-mix(in oklab,var(--panel) 80%,#fff) 0%,var(--panel) 18%,var(--panel) 70%,color-mix(in oklab,var(--panel) 86%,#000) 100%);
   box-shadow:inset 0 2px 0 rgba(255,255,255,.45),inset 0 -3px 8px rgba(0,0,0,.14),0 7px 0 color-mix(in oklab,var(--panel) 62%,#000),0 22px 38px rgba(0,0,0,.32)}
 body[data-skin="radio"] .feedback,body[data-skin="radio"] .keyui{width:100%}
@@ -120,13 +124,13 @@ body[data-skin="radio"] .controls{gap:16px}
 body[data-skin="radio"] .field::before{content:"";position:absolute;inset:3%;border-radius:50%;
   background:radial-gradient(circle at 34% 28%,color-mix(in oklab,var(--panel) 70%,#fff) 0%,var(--panel2) 55%,color-mix(in oklab,var(--panel2) 80%,#000) 100%);
   box-shadow:0 10px 18px rgba(0,0,0,.28),0 3px 0 color-mix(in oklab,var(--panel2) 60%,#000),inset 0 2px 1px rgba(255,255,255,.5),inset 0 -6px 10px rgba(0,0,0,.12)}
-body[data-skin="radio"] .chip{text-shadow:0 1px 0 rgba(255,255,255,.35)}
+body[data-skin="radio"] .chip{text-shadow:0 1px 0 rgba(255,255,255,.45),0 -1px 0 rgba(0,0,0,.18)}
 body[data-skin="radio"] .rings .grille{fill:color-mix(in oklab,var(--panel2) 85%,#000);filter:drop-shadow(0 -.4px 0 rgba(0,0,0,.25))}
 @supports (corner-shape:squircle){body[data-skin="radio"] .device{corner-shape:squircle;border-radius:64px}}
 .plate{display:none;width:100%;justify-content:space-between;align-items:center;font-family:var(--fd);font-size:17px;color:var(--muted);letter-spacing:.06em;margin-bottom:6px}
 .plate .leds{display:flex;gap:6px;align-items:center}
 .plate .leds i{width:7px;height:7px;border-radius:50%;background:var(--faint)}
-.plate .leds i.on{background:var(--lcd);box-shadow:0 0 6px var(--lcd)}
+.plate .leds i.on{background:var(--orange);box-shadow:0 0 6px var(--orange)}
 body[data-skin="radio"] .plate{display:flex}
 .grille{display:none;width:calc(100% + 40px);height:34px;margin:10px -20px 0;flex:none;background-color:var(--panel2);
   background-image:radial-gradient(circle at 50% 40%,color-mix(in oklab,var(--ink) 55%,transparent) 1.6px,rgba(255,255,255,.25) 2.2px,transparent 2.6px);background-size:9px 9px;border-top:1px solid var(--line);
@@ -149,12 +153,12 @@ body[data-skin="radio"] .screen{display:block}
   .feedback{height:104px}
   body[data-skin="radio"] .screen{height:48px}
   body[data-skin="radio"] .grille{height:22px;margin-top:6px}
-  body[data-skin="radio"] .stage{--res:330px}
-  body[data-skin="radio"][data-mode="key"] .stage{--res:402px;--fw:max(150px,min(380px,calc(100cqw - 76px),calc(100cqh - var(--res))))}
+  body[data-skin="radio"] .stage{--res:312px}
+  body[data-skin="radio"][data-mode="key"] .stage{--res:402px;--fw:max(150px,min(460px,calc(100cqw - 44px),calc(100cqh - var(--res))))}
 }
 @media (max-height:620px) and (orientation:portrait){
   body[data-skin="radio"] .plate{display:none}
-  body[data-skin="radio"] .stage{--res:318px;--fw:max(150px,min(380px,calc(100cqw - 76px),calc(100cqh - var(--res))))}
+  body[data-skin="radio"] .stage{--res:300px;--fw:max(150px,min(460px,calc(100cqw - 44px),calc(100cqh - var(--res))))}
   body[data-skin="radio"][data-mode="key"] .stage{--res:368px}
   .piano{height:84px}.feedback{height:96px}
   body[data-skin="radio"][data-mode="key"] .screen{height:38px}body[data-skin="radio"][data-mode="key"] .piano{height:70px}body[data-skin="radio"][data-mode="key"] .keyui{gap:6px}
@@ -178,14 +182,14 @@ body[data-skin="space"] .radio-only,body[data-skin="radio"] .space-only{display:
 
 .indicator{position:absolute;inset:0;pointer-events:none;transform:rotate(var(--a,0deg));transition:transform .7s cubic-bezier(.3,1.35,.5,1),opacity .3s;opacity:0}
 .indicator.on{opacity:1}
-.indicator{--ic:var(--ink)}.indicator.ok{--ic:var(--blue)}.indicator.no{--ic:var(--orange)}
+.indicator{--ic:var(--orange)}
 body[data-skin="space"] .indicator::after{content:"";position:absolute;left:50%;top:4%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--ic);box-shadow:0 0 16px 5px color-mix(in oklab,var(--ic) 55%,transparent)}
 body[data-skin="radio"] .indicator::after{content:"";position:absolute;left:50%;top:1%;width:3px;height:9%;margin-left:-1.5px;background:var(--ic);border-radius:1px}
 @media (prefers-reduced-motion:reduce){.indicator{transition:none}}
 
 .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:40%;max-height:40%;overflow:hidden;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:1}
 .keyname{font-family:var(--fd);font-size:clamp(13px,5.4cqi,21px);font-weight:500;letter-spacing:.01em;line-height:1.2}
-body[data-skin="space"] .keyname{font-weight:300;color:#F2F5FF;text-shadow:0 0 18px rgba(255,236,205,.4)}
+body[data-skin="space"] .keyname{font-weight:300;color:#F2F5FF;text-shadow:0 0 18px rgba(255,170,100,.45)}
 body[data-skin="space"] .center .prompt{color:rgba(225,232,250,.72)}
 body[data-skin="space"] .center .slot{color:#EAF0FF;border-color:rgba(225,232,250,.35)}
 body[data-skin="space"] .center .slot.filled{border-color:#EAF0FF}
@@ -205,20 +209,23 @@ body[data-skin="radio"] .slot{font-size:19px}
 
 .node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:0;align-items:center;z-index:2}
 .chip{font-family:var(--fc);font-size:clamp(11px,3.6cqi,15px);font-weight:500;color:var(--ink);padding:5px 6px;min-width:44px;min-height:32px;line-height:1.2;transition:color .2s,text-shadow .2s,transform .1s}
-.chip.chrom{color:var(--muted)} .chip.home{font-weight:700}
-.chip.big,.chip.deg{font-size:clamp(13px,4.2cqi,17px);min-height:44px}
+.chip.chrom{color:color-mix(in oklab,var(--ink) 62%,var(--muted))} .chip.home{font-weight:700}
+.chip.big,.chip.deg{font-size:clamp(15px,5.2cqi,22px);min-height:44px}
+/* a soft halo in the background color lifts labels off the stars and the glow */
+body[data-skin="space"] .chip{font-weight:600;text-shadow:0 0 3px var(--bg),0 0 8px var(--bg),0 0 14px var(--bg)}
+body[data-skin="space"] .chip.chrom{font-weight:500}
 .dl{font-size:clamp(8px,2.3cqi,10px);color:var(--faint);line-height:1;margin-bottom:1px;font-family:var(--fb)}
 .chip:active{transform:scale(.92)}
 @media (hover:hover){body[data-skin="space"] .chip:hover{color:var(--blue);text-shadow:0 0 14px var(--blue)}}
-body[data-skin="radio"] .chip{font-size:clamp(15px,5.4cqi,21px);padding:1px 5px;min-height:28px}
+body[data-skin="radio"] .chip{font-size:clamp(17px,6cqi,24px);padding:1px 5px;min-height:28px}
 body[data-skin="radio"] .chip.big,body[data-skin="radio"] .chip.deg{min-height:44px}
-body[data-skin="radio"] .chip.big,body[data-skin="radio"] .chip.deg{font-size:clamp(18px,6.6cqi,25px)}
-@media (hover:hover){body[data-skin="radio"] .chip:hover{color:var(--blue)}}
+body[data-skin="radio"] .chip.big,body[data-skin="radio"] .chip.deg{font-size:clamp(21px,8cqi,32px)}
+@media (hover:hover){body[data-skin="radio"] .chip:hover{color:var(--orange)}}
 .chip.is-answer{color:var(--blue)!important}
 body[data-skin="space"] .chip.is-answer{text-shadow:0 0 16px var(--blue)}
 body[data-skin="radio"] .chip.is-answer{text-decoration:underline 2px;text-underline-offset:4px}
 .chip.is-wrong{color:var(--orange)!important;text-decoration:line-through 1.5px}
-.chip.flash{color:var(--blue)!important}
+.chip.flash{color:var(--orange)!important}
 .ghost{width:3px;height:3px;border-radius:50%;background:var(--faint)}
 
 /* text buttons */
@@ -228,8 +235,20 @@ body[data-skin="radio"] .chip.is-answer{text-decoration:underline 2px;text-under
 .tbtn.primary{color:var(--ink);font-family:var(--fd);font-size:15px}
 body[data-skin="space"] .tbtn.primary{font-weight:300;letter-spacing:.18em;text-transform:uppercase;font-size:13px;text-shadow:0 0 18px color-mix(in oklab,var(--blue) 80%,transparent)}
 body[data-skin="radio"] .tbtn{font-family:var(--fd);font-size:20px}
-body[data-skin="radio"] .tbtn.primary{color:var(--ink);font-size:24px}
+body[data-skin="radio"] .tbtn.primary{color:var(--orange);font-size:24px}
 .tbtn.ok{color:var(--blue)!important} .tbtn.no{color:var(--orange)!important}
+.ibtn{display:inline-grid;place-items:center;min-width:48px;padding:10px}
+.ibtn svg{width:24px;height:24px}
+.controls .ibtn.primary svg{width:28px;height:28px}
+body[data-skin="radio"] .ibtn svg{stroke-width:2}
+.controls{min-height:48px;align-items:center}
+.center .cplay{pointer-events:auto;width:clamp(56px,22cqi,104px);height:clamp(56px,22cqi,104px)}
+body[data-skin="space"] .center .cplay{color:#F2F5FF;border:1px solid color-mix(in oklab,var(--blue) 50%,transparent);box-shadow:0 0 30px color-mix(in oklab,var(--blue) 35%,transparent),inset 0 0 20px color-mix(in oklab,var(--blue) 20%,transparent)}
+.prompt.res{font-family:var(--fc);font-size:clamp(18px,8cqi,34px);font-weight:600;line-height:1.1;letter-spacing:.01em}
+body[data-skin="space"] .center .prompt.res{color:#F2F5FF}
+body[data-skin="radio"] .prompt.res{font-size:clamp(22px,9cqi,38px);font-weight:400;color:var(--ink)}
+body .center .prompt.res.ok{color:var(--blue)}body .center .prompt.res.no{color:var(--orange)}
+.fb-text s.mine{color:var(--orange);text-decoration:line-through 1.5px;font-weight:500}
 .kbd{font-size:11px;color:var(--faint);margin-top:8px;text-align:center}
 body[data-skin="radio"] .kbd{color:var(--muted)}
 [hidden]{display:none!important}
@@ -243,11 +262,11 @@ body[data-mode="key"] .feedback{display:none}
 .fb-feel{display:block;color:var(--muted);font-size:13px}
 .link{color:var(--blue);font-size:13px;padding:6px 0}
 .link:hover{text-decoration:underline;text-underline-offset:3px}
-.link.on{color:var(--ink)}
+.link.on{color:var(--orange)}
 body[data-skin="radio"] .link{font-family:var(--fd);font-size:18px}
 .namein{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin:4px 0 2px}
 .namein input{font:inherit;font-family:var(--fc);font-size:18px;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid var(--faint);padding:2px 2px 4px;width:150px;outline:none}
-.namein input:focus{border-color:var(--ink)}
+.namein input:focus{border-color:var(--orange)}
 body[data-skin="radio"] .namein input{font-size:24px}
 .ins{display:flex;gap:10px;flex-wrap:wrap}
 .namebtns{display:flex;gap:16px;margin:2px 0}
@@ -259,8 +278,8 @@ body[data-skin="radio"] .namein input{font-size:24px}
 .kcenter{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;width:56%;text-align:center;z-index:2}
 .kplay{width:clamp(64px,26cqi,120px);height:clamp(64px,26cqi,120px);border-radius:50%;display:grid;place-items:center;color:var(--ink);border:1px solid var(--line)}
 body[data-skin="space"] .kplay{border-color:color-mix(in oklab,var(--blue) 50%,transparent);box-shadow:0 0 30px color-mix(in oklab,var(--blue) 35%,transparent),inset 0 0 20px color-mix(in oklab,var(--blue) 20%,transparent)}
-body[data-skin="radio"] .kplay{background:var(--ink);color:var(--panel);border:0;box-shadow:0 3px 0 color-mix(in oklab,var(--ink) 55%,#000)}
-body[data-skin="radio"] .kplay:active{transform:translateY(2px);box-shadow:0 1px 0 color-mix(in oklab,var(--ink) 55%,#000)}
+body[data-skin="radio"] .kplay{background:var(--orange);color:#fff;border:0;box-shadow:0 3px 0 color-mix(in oklab,var(--orange) 55%,#000)}
+body[data-skin="radio"] .kplay:active{transform:translateY(2px);box-shadow:0 1px 0 color-mix(in oklab,var(--orange) 55%,#000)}
 .kplay svg{width:38%;height:38%}
 .ktitle{font-family:var(--fd);font-size:clamp(12px,4.6cqi,18px);font-weight:500}
 body[data-skin="space"] .ktitle{font-weight:300;letter-spacing:.08em}
@@ -268,13 +287,14 @@ body[data-skin="radio"] .ktitle{font-size:clamp(18px,7cqi,27px)}
 .ksub{font-size:12px;color:var(--muted);min-height:18px}
 .kmeta{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;align-items:center;font-size:clamp(9px,2.8cqi,11px);color:var(--muted);letter-spacing:.04em}
 body[data-skin="radio"] .kmeta{font-family:var(--fd);font-size:16px}
-.lights{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}
+.lights{display:inline-flex;gap:3px;vertical-align:middle}
 .lights i{width:6px;height:6px;border-radius:50%;background:var(--faint)}
-.lights i.on{background:var(--ink)}
-.passdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--faint);margin-left:6px;vertical-align:middle}
+.lights i.on{background:var(--orange);box-shadow:0 0 6px var(--orange)}
+.passdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--faint);vertical-align:middle}
 .passdot.on{background:var(--blue);box-shadow:0 0 6px var(--blue)}
 .keyui{width:min(520px,calc(100cqw - 32px));display:flex;flex-direction:column;gap:10px;align-items:center}
-.piano{position:relative;width:100%;height:104px;display:flex;gap:2px;user-select:none;touch-action:none}
+.piano{position:relative;width:100%;height:104px;display:flex;gap:2px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none}
+.piano *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;pointer-events:auto}
 .wk{flex:1;border:1px solid var(--line);border-radius:0 0 8px 8px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:7px;font-size:11px;color:var(--muted);transition:background .15s}
 body[data-skin="space"] .wk{background:color-mix(in oklab,var(--ink) 4%,transparent)}
 .bk{position:absolute;top:0;width:9%;height:58%;background:var(--ink);color:var(--bg);border-radius:0 0 6px 6px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;font-size:9px;z-index:2}
@@ -282,20 +302,18 @@ body[data-skin="radio"] .wk{background:linear-gradient(180deg,var(--panel2),colo
 body[data-skin="radio"] .bk{background:linear-gradient(180deg,#2a3138,#12171b);color:#cfd6da;box-shadow:inset 0 -4px 0 rgba(255,255,255,.08),0 3px 4px rgba(0,0,0,.35)}
 body[data-skin="radio"] .bk{font-family:var(--fd);font-size:14px}
 .wk.down,.bk.down{filter:brightness(.85)}
-.wk.sel,.bk.sel{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-body[data-skin="radio"] .bk.sel{background:var(--lcd);color:#12171b}
-body[data-skin="space"] .wk.sel,body[data-skin="space"] .bk.sel{box-shadow:0 0 18px color-mix(in oklab,var(--ink) 45%,transparent)}
+.wk.sel,.bk.sel{background:var(--orange);color:#fff;border-color:var(--orange)}
+body[data-skin="space"] .wk.sel,body[data-skin="space"] .bk.sel{box-shadow:0 0 20px color-mix(in oklab,var(--orange) 60%,transparent)}
 .wk.ans.no,.bk.ans.no{box-shadow:inset 0 0 0 2px var(--orange)}
 .wk.ans,.bk.ans{box-shadow:inset 0 0 0 2px var(--blue)}
 .krow{position:relative;display:flex;gap:clamp(10px,4cqw,22px);flex-wrap:nowrap;white-space:nowrap;justify-content:center;align-items:center;width:100%}
 #kPrev,#kNext{min-width:44px;font-size:22px}
-.krow #kReveal{font-size:12px;margin-left:8px}
-body[data-skin="radio"] .krow #kReveal{font-size:17px}
+.krow #kReveal{margin-left:4px}
 .ringdots{position:absolute;inset:0;pointer-events:none;z-index:3}
 .ringdots button{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;pointer-events:auto;display:grid;place-items:center}
 .ringdots button::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--faint)}
 .ringdots button.pass::after{background:var(--blue);box-shadow:0 0 6px var(--blue)}
-.ringdots button.cur::after{width:9px;height:9px;background:var(--ink);box-shadow:0 0 8px color-mix(in oklab,var(--ink) 60%,transparent)}
+.ringdots button.cur::after{width:9px;height:9px;background:var(--orange);box-shadow:0 0 8px var(--orange)}
 .ringdots button.off{opacity:.3}
 .ringdots button.cur.pass::after{outline:1.5px solid var(--blue);outline-offset:2px}
 .dots-unused{display:none}
@@ -310,13 +328,15 @@ body[data-skin="radio"] .focus{font-family:var(--fd);font-size:17px}
 @media (orientation:landscape) and (max-height:560px){
   .top{grid-template-columns:auto 1fr auto;grid-template-areas:"brand tabs tools";padding:4px 16px 0;column-gap:16px}
   .brand .bt,.score .long{display:none}.tabs .l{display:none}.tabs .s{display:inline}.tabs{gap:2px 14px}
-  .stage{min-height:0;padding:0 12px 4px;--fw:max(170px,min(calc(100cqh - 30px),calc(50cqw - 20px)))!important}
-  body[data-skin="radio"] .stage{--fw:max(160px,min(calc(100cqh - 104px),calc(46cqw - 40px)))!important}
-  body[data-skin="space"] .device{height:auto}body[data-skin="space"] .field{margin:6px 0}
+  .stage{min-height:0;padding:0 12px 4px;--fw:max(170px,min(calc(100cqh - 40px),calc(50cqw - 20px)))!important}
+  body[data-skin="radio"] .stage{--fw:max(160px,min(calc(100cqh - 62px),calc(50cqw - 40px)))!important}
+  .stage{justify-content:center}
+  body[data-skin="space"] .device{height:auto;width:auto}body[data-skin="space"] .field{margin:6px 0}
   .keyui{width:100%}
   body[data-skin="radio"][data-mode="key"] .screen{height:42px}body[data-skin="radio"][data-mode="key"] .piano{height:70px}body[data-skin="radio"] .grille{height:24px;margin-top:6px}
-  .device{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"field controls" "field keyui" "field feedback";column-gap:24px;align-items:center;width:100%;max-width:960px}
-  body[data-skin="radio"] .device{width:100%;grid-template-areas:"plate plate" "field screen" "field controls" "field keyui" "field feedback" "grille grille";padding-top:10px}
+  .device{display:grid;grid-template-columns:auto minmax(240px,400px);grid-template-areas:"field controls" "field keyui" "field feedback";column-gap:28px;align-items:center;align-content:center;width:auto;max-width:100%;margin:0 auto}
+  body[data-skin="radio"] .device{width:auto;grid-template-areas:"field plate" "field screen" "field controls" "field keyui" "field feedback" "grille grille";grid-template-rows:auto auto auto auto 1fr auto;padding-top:10px;column-gap:22px}
+  body[data-skin="radio"] .field{align-self:center}
   .plate{grid-area:plate}.screen{grid-area:screen}.field{grid-area:field;margin:6px 0}.controls{grid-area:controls}.keyui{grid-area:keyui}.feedback{grid-area:feedback;width:100%;height:auto;max-height:46cqh}.grille{grid-area:grille;width:auto}
   body[data-mode="key"] .feedback{display:none}
   body[data-skin="radio"] .feedback{max-height:30cqh}
@@ -357,7 +377,7 @@ input[type=range]{width:110px;accent-color:var(--blue)}
 .seg{display:inline-flex;gap:12px;flex:none}
 .seg button{font-size:13px;color:var(--muted);padding:2px 0;border-bottom:1.5px solid transparent}
 .seg button:hover{color:var(--ink)}
-.seg button[aria-pressed="true"]{color:var(--ink);border-color:var(--ink)}
+.seg button[aria-pressed="true"]{color:var(--ink);border-color:var(--orange)}
 .seg button{min-height:32px}.seg.big button{min-width:44px;min-height:40px}
 body[data-skin="radio"] .seg button{font-family:var(--fd);font-size:18px}
 .seg.big{gap:22px}.seg.big button{font-size:15px}
@@ -416,7 +436,8 @@ details summary::-webkit-details-marker{display:none}
       <svg class="rings" viewBox="0 0 100 100" aria-hidden="true" id="rings"></svg>
       <div class="indicator" id="indicator"></div>
       <div class="center" id="stdCenter">
-        <div class="keyname" id="keyname">—</div>
+        <button class="kplay cplay" id="cPlay" aria-label="Start" title="Start"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg></button>
+        <div class="keyname" id="keyname"></div>
         <div class="prompt" id="prompt"></div>
         <div class="slots" id="slots"></div>
       </div>
@@ -424,23 +445,25 @@ details summary::-webkit-details-marker{display:none}
         <button class="kplay" id="kPlay" aria-label="Play"></button>
         <div class="ktitle" id="kTitle"></div>
         <div class="ksub" id="kSub"></div>
-        <div class="kmeta"><span>Passed<span class="passdot" id="kPass"></span></span><span>Diff<span class="lights" id="kDiff"></span></span></div>
+        <div class="kmeta"><span class="passdot" id="kPass" title="Passed"></span><span class="lights" id="kDiff" title="Difficulty"></span></div>
       </div>
       <div id="nodes"></div>
       <div class="ringdots" id="kDots" hidden></div>
     </div>
 
     <div class="controls" id="stdControls">
-      <button class="tbtn primary" id="btnMain">Start</button>
-      <button class="tbtn" id="btnKey" hidden>Hear key again</button>
-      <button class="tbtn" id="btnUndo" hidden>Undo</button>
+      <button class="tbtn ibtn" id="btnReplay" aria-label="Replay" title="Replay" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.3-5.4"/><path d="M4 4.5v4h4"/></svg></button>
+      <button class="tbtn ibtn" id="btnKey" aria-label="Hear the key" title="Hear the key" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5"/><path d="M6.5 10v9h11v-9"/><path d="M10.5 19v-5h3v5"/></svg></button>
+      <button class="tbtn ibtn" id="btnUndo" aria-label="Undo" title="Undo" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4.5 9.5 9 5"/><path d="M4.5 9.5H14a5 5 0 0 1 0 10h-3"/></svg></button>
+      <button class="tbtn ibtn" id="btnRes" aria-label="Resolve home" title="Resolve home" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5c7 0 12 4 12 11"/><path d="m13.5 13 3.5 3.5 3.5-3.5"/><circle cx="17" cy="20.2" r="1.2" fill="currentColor" stroke="none"/></svg></button>
+      <button class="tbtn ibtn primary" id="btnMain" aria-label="Next" title="Next" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12h15"/><path d="m13.5 6 6 6-6 6"/></svg></button>
     </div>
     <div class="focus" id="focusTag" hidden></div>
 
     <div class="keyui" id="keyUI" hidden>
       <div class="krow">
         <div class="seg big" id="kTon" role="group" aria-label="Major or minor"><button data-v="maj">maj</button><button data-v="min">min</button></div>
-        <button class="tbtn" id="kReveal">Show key</button>
+        <button class="tbtn ibtn" id="kReveal" aria-label="Show the key" title="Show the key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
       </div>
       <div class="piano" id="piano"></div>
       <div class="krow">
@@ -682,7 +705,7 @@ function drawSky(level){
   sky.warp*=.97;sky.tint*=.95;
   const base=scopeColors.star||'#fff',blue=scopeColors.blue,tc=scopeColors.orange,gl=scopeColors.glow;
   // keep streaks faint behind text so it stays readable
-  const zones=[...document.querySelectorAll('.top,#stdControls,#feedback,#focusTag,.krow')].filter(el=>el.offsetParent&&el.childElementCount)
+  const zones=[...document.querySelectorAll('.top,#stdControls,#feedback,#focusTag,.krow,#nodes .chip')].filter(el=>el.offsetParent&&(el.childElementCount||el.textContent.trim()))
     .map(el=>{const r=el.getBoundingClientRect();return [(r.left-8)*d,(r.top-6)*d,(r.right+8)*d,(r.bottom+6)*d];});
   const inZone=(x,y)=>zones.some(z=>x>z[0]&&x<z[2]&&y>z[1]&&y<z[3]);
   g.lineCap='round';
@@ -704,14 +727,16 @@ const swirl=[...Array(70)].map(()=>({a:Math.random()*Math.PI*2,r:1.04+Math.rando
 function drawHole(g,cx,cy,R,data,level,d){
   const still=reduced.matches;sky.spin+=still?0:.004+level*.02;
   // corona
-  const cg=g.createRadialGradient(cx,cy,R*.95,cx,cy,R*2.3);
-  cg.addColorStop(0,scopeColors.core);cg.addColorStop(.08,scopeColors.glow);cg.addColorStop(.3,'rgba(236,214,182,.24)');
+  // fade out before the canvas edge so the glow never shows a square border
+  const CR=Math.min(R*2.3,Math.min(cx,cy)*.98);
+  const cg=g.createRadialGradient(cx,cy,R*.95,cx,cy,CR);
+  cg.addColorStop(0,scopeColors.core);cg.addColorStop(.08,scopeColors.glow);cg.addColorStop(.3,'rgba(255,120,40,.28)');
   cg.addColorStop(.6,'rgba(90,140,255,.12)');cg.addColorStop(1,'rgba(90,140,255,0)');
-  g.globalAlpha=.75+Math.min(.25,level*2);g.fillStyle=cg;g.beginPath();g.arc(cx,cy,R*2.3,0,Math.PI*2);g.fill();g.globalAlpha=1;
+  g.globalAlpha=.75+Math.min(.25,level*2);g.fillStyle=cg;g.beginPath();g.arc(cx,cy,CR,0,Math.PI*2);g.fill();g.globalAlpha=1;
   // accretion swirl
   g.lineCap='round';
   for(const s of swirl){const a=s.a+sky.spin/s.r;const rr=R*s.r;
-    g.strokeStyle=s.c<.25?scopeColors.blue:s.c<.7?scopeColors.glow:scopeColors.ring;
+    g.strokeStyle=s.c<.25?scopeColors.blue:s.c<.7?scopeColors.glow:'#FFE7CC';
     g.globalAlpha=(1.6-s.r)*.55;g.lineWidth=(s.c<.7?1.2:.8)*d;
     g.beginPath();g.arc(cx,cy,rr,a,a+s.l);g.stroke();}
   g.globalAlpha=1;
@@ -801,20 +826,34 @@ function renderSlots(){
   const ctxm=Q.mode==='context';
   el.innerHTML=Q.items.map((it,i)=>{const a=Q.answers[i],has=a!=null;let cls='slot sq'+(has?' filled':'');if(Q.graded)cls+=String(a)===String(ctxm?it.chord.id:it.pos)?' ok':' no';return `<span class="${cls}">${has?(ctxm?BYID[a].lab:DEG[a]):''}</span>`;}).join('');
 }
-const setPrompt=t=>{$('#prompt').textContent=t;};
-const setKeyName=t=>{$('#keyname').textContent=t;$('#readL').textContent=t.toUpperCase();};
+const setPrompt=t=>{const el=$('#prompt');el.className='prompt';el.textContent=t;};
+// the answer, big, in the middle of the circle: blue when right, orange when wrong
+const showResult=(t,ok)=>{const el=$('#prompt');el.className='prompt res'+(ok===true?' ok':ok===false?' no':'');el.textContent=t;if(t)$('#readL').textContent=t.toUpperCase();};
+const fbMark=ok=>`<span class="fb-mark ${ok?'ok':'no'}">${ok?'✓':'✗'}</span>`;
+const fbPair=(ok,mine,right)=>ok?`<b>${right}</b>`:`<s class="mine">${mine}</s> → <b>${right}</b>`;
+// the "how it feels" line only shows after a miss, when it's useful
+const fbLine=(ok,main,feel)=>`<div class="fb-line">${fbMark(ok)}<span class="fb-text">${main}${feel&&!ok?`<span class="fb-feel">${feel}</span>`:''}</span></div>`;
+const setKeyName=t=>{$('#keyname').textContent=t;$('#readL').textContent=(t||'Tonal Field').toUpperCase();};
 function updateScore(){
   const s=session,goal=S.goal&&S.mode!=='key'?S.goal:0,el=$('#score');
   if(!s.n){el.innerHTML=goal?`<span class="long">Goal: </span><b>0/${goal}</b>`:'';el.title='';return;}
   el.innerHTML=`<span class="long">This session: </span><b>${s.c}/${s.n}</b>`+(goal?` <span>· ${Math.max(0,goal-s.n)} left</span>`:'')+(s.streak>=3?`<span class="long"> · ${s.streak} in a row</span>`:'');
   el.title=`${s.c} right out of ${s.n}`+(s.streak>=3?`, ${s.streak} in a row`:'');
 }
+const ICON_NEXT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12h15"/><path d="m13.5 6 6 6-6 6"/></svg>';
+const ICON_STOP='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>';
 function updateButtons(){
-  const answering=Q&&!Q.graded;
-  $('#btnMain').textContent=pocket?'Hands-free is on':session.done&&!answering?'New session':!Q?'Start':answering?'Replay':'Next question';
-  $('#btnKey').hidden=!((S.mode==='context'||S.mode==='degrees')&&Q);
+  const answering=Q&&!Q.graded,graded=Q&&Q.graded,keyed=S.mode==='context'||S.mode==='degrees';
+  const m=$('#btnMain'),lab=pocket?'Stop hands-free':session.done&&graded?'New session':'Next';
+  m.innerHTML=pocket?ICON_STOP:ICON_NEXT;m.hidden=!(pocket||graded);m.setAttribute('aria-label',lab);m.title=lab;
+  $('#cPlay').hidden=!!Q||pocket||S.mode==='key';
+  $('#btnReplay').hidden=!Q||pocket;
+  $('#btnKey').hidden=!(keyed&&Q)||pocket;
+  $('#btnRes').hidden=!(keyed&&graded)||pocket;
   $('#btnUndo').hidden=!((S.mode==='context'||(Q&&Q.multi))&&answering&&Q.answers.length>0);
 }
+function replay(){if(!Q||pocket)return;
+  if(Q.mode==='intervals')playInterval(Q.root,Q.second,Q.dir);else if(Q.mode==='degrees')playDegree(false);else if(Q.mode==='quality')playQualityChord(Q.target,Q.root);else playContext(false);}
 
 /* ================= Shared helpers ================= */
 let Q=null,pocket=false,focus=null;
@@ -860,7 +899,7 @@ function showSummary(){
 }
 function newSessionStart(){session=newSession();updateScore();nextQuestion();}
 function startFocus(ids){if(!ids.length)return;focus={mode:S.mode,ids};session=newSession();updateScore();renderFocus();Q=null;renderNodes();nextQuestion();}
-function endFocus(){focus=null;renderFocus();stopAll();Q=null;$('#feedback').innerHTML='';setIndicator(null);renderNodes();renderSlots();setPrompt('Weak-spots practice ended.');updateButtons();}
+function endFocus(){focus=null;renderFocus();stopAll();Q=null;$('#feedback').innerHTML='';setIndicator(null);renderNodes();renderSlots();setPrompt('');updateButtons();}
 function renderFocus(){const el=$('#focusTag');document.body.classList.toggle('focusing',!!focus);
   if(!focus){el.hidden=true;el.innerHTML='';return;}
   el.hidden=false;el.innerHTML=`<span>Weak spots: <b>${focus.ids.map(id=>LABEL[focus.mode](id)).join(' · ')}</b></span><button class="link" data-act="endfocus">End</button>`;}
@@ -887,14 +926,11 @@ function newDegree(){
   for(let i=0;i<n;i++){const pos=pickWeighted(set,p=>ton+':'+p,STATS.deg,last.deg);last.deg=ton+':'+pos;items.push({pos,midi:base+pos+(S.range===2&&Math.random()<.5?12:0)});}
   Q={mode:'degrees',ton,key,items,target:items[0].pos,midi:items[0].midi,answers:[],multi:n>1,graded:false}; return true;
 }
-const degAsk=()=>Q.multi?`Choose note ${Q.answers.length+1} of ${Q.items.length}.`:'Which degree was it?';
 function playDegreeSeq(t){const b=bus(),L=Q.multi?Math.min(S.noteLen,.9):S.noteLen;Q.items.forEach(it=>{tone(b,it.midi,t,L,.15);t+=Q.multi?L*.95:L;});return t;}
 function playDegree(withCad){
   ac();stopAll();ensureDrone(Q.key);let t=now()+.12;
   if(withCad) t=playVoicings(cadenceVs(Q.key,Q.ton),t,S.cadLen)+.5;
   const end=playDegreeSeq(t);sounding(end-now());
-  setPrompt(withCad?(Q.multi?'Listen to the key, then the notes.':'Listen to the key, then the note.'):'Listening…');
-  later(end-now(),()=>{if(Q&&!Q.graded&&!pocket)setPrompt(degAsk());});
   return end-now();
 }
 function resolvePath(pos,ton){const sc=SCALE[ton];if(pos===0)return[0];if(pos>=6){const up=sc.filter(x=>x>pos);return[pos,...up,12];}const dn=sc.filter(x=>x<pos).reverse();return[pos,...dn];}
@@ -902,26 +938,21 @@ function playResolve(){ac();stopAll();const b=bus();let t=now()+.08;const it=Q.m
   resolvePath(pos,Q.ton).forEach((p,i,a)=>{const last=i===a.length-1;tone(b,base+p,t,last?1.2:.42,.14);t+=last?1.2:.42;});sounding(t-now());}
 function answerDegree(p){
   Q.ans=+p;Q.graded=true;const ok=Q.ans===Q.target;record(STATS.deg,Q.ton+':'+Q.target,Q.ton+':'+Q.ans);scored(ok,ok?[]:[Q.ton+':'+Q.target]);
-  setIndicator(Q.target*30,ok);setPrompt(ok?'Correct.':'Not quite.');markChips();updateButtons();
-  $('#feedback').innerHTML=`<div class="fb-line"><span class="fb-mark ${ok?'ok':'no'}">${ok?'✓':'✗'}</span>
-   <span class="fb-text">${ok?`<b>${DEG[Q.target]}</b>`:`You chose <b>${DEG[Q.ans]}</b>; it was <b>${DEG[Q.target]}</b>`} in ${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}
-   <span class="fb-feel">${DEGFEEL[Q.target]}</span></span>
-   ${ok?'':`<button class="link" data-act="degmine">Play yours</button>`}<button class="link" data-act="degans">Play answer</button><button class="link" data-act="degres">Resolve to 1</button></div>`;
+  setIndicator(Q.target*30,ok);showResult(DEG[Q.target],ok);markChips();updateButtons();
+  $('#feedback').innerHTML=fbLine(ok,fbPair(ok,DEG[Q.ans],DEG[Q.target]),DEGFEEL[Q.target]);
 }
 function answerDegreeSeq(p){
   if(Q.answers.length>=Q.items.length)return;Q.answers.push(+p);renderSlots();updateButtons();
-  if(Q.answers.length===Q.items.length)gradeDegreeSeq();else setPrompt(degAsk());
+  if(Q.answers.length===Q.items.length)gradeDegreeSeq();
 }
 function gradeDegreeSeq(){
   Q.graded=true;let all=true;const miss=[];
   Q.items.forEach((it,i)=>{const a=Q.answers[i];record(STATS.deg,Q.ton+':'+it.pos,Q.ton+':'+a);if(a!==it.pos){all=false;miss.push(Q.ton+':'+it.pos);}});
-  scored(all,miss);setPrompt(all?'Correct.':'Some misses; compare below.');
+  scored(all,miss);showResult('',all);
   setIndicator(Q.items[Q.items.length-1].pos*30,all);renderSlots();markChips();updateButtons();
-  $('#feedback').innerHTML=`<div class="fb-line"><span class="fb-mark ${all?'ok':'no'}">${all?'✓':'✗'}</span><span class="fb-text">`+
+  $('#feedback').innerHTML=`<div class="fb-line">${fbMark(all)}<span class="fb-text">`+
     Q.items.map((it,i)=>{const a=Q.answers[i];return a===it.pos?`<button class="link" data-act="dnote" data-i="${i}">${DEG[it.pos]}</button>`
-      :`<button class="link" style="color:var(--orange)" data-act="dnote" data-i="${i}" title="You chose ${DEG[a]}">${DEG[a]} → ${DEG[it.pos]}</button>`;}).join('  ')+
-    ` in ${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}<span class="fb-feel">${all?'All correct. Tap a note to hear it.':'Orange shows your answer → the real note. Tap any note to hear it.'}</span></span></div>
-    <div class="fb-line"><span class="fb-mark"></span><span class="fb-text"><button class="link" data-act="dmel">Play the melody</button>${all?'':'  <button class="link" data-act="dmine">Play your version</button>'}  <button class="link" data-act="degres">Resolve to 1</button></span></div>`;
+      :`<button class="link" style="color:var(--orange)" data-act="dnote" data-i="${i}" title="You chose ${DEG[a]}">${DEG[a]} → ${DEG[it.pos]}</button>`;}).join('  ')+`</span></div>`;
 }
 function playDegreeNote(p,midi){ac();stopAll();if(midi!=null){const b=bus();tone(b,midi,now()+.05,S.noteLen,.15);sounding(S.noteLen);return;}const base=Q?Q.midi-Q.target:tonicBase(S.key==='random'?0:+S.key);const b=bus();tone(b,base+ +p,now()+.05,S.noteLen,.15);sounding(S.noteLen);}
 
@@ -941,11 +972,8 @@ function playInterval(a,b,dir){
 }
 function answerInterval(p){
   Q.ans=+p;Q.graded=true;const ok=Q.ans===Q.target;record(STATS.int,String(Q.target),String(Q.ans));scored(ok,ok?[]:[String(Q.target)]);
-  setIndicator(Q.target*30,ok);setKeyName(`${INT[Q.target]} ${DIRW[Q.dir].toLowerCase()}`);setPrompt(ok?'Correct.':'Not quite.');markChips();updateButtons();
-  $('#feedback').innerHTML=`<div class="fb-line"><span class="fb-mark ${ok?'ok':'no'}">${ok?'✓':'✗'}</span>
-   <span class="fb-text">${ok?`<b>${INT[Q.target]}</b>, ${INTSPK[Q.target]}`:`You chose <b>${INT[Q.ans]}</b>; it was <b>${INT[Q.target]}</b>, ${INTSPK[Q.target]}`}
-   <span class="fb-feel">${INTFEEL[Q.target]}</span></span>
-   ${ok?'':`<button class="link" data-act="intmine">Play yours</button>`}<button class="link" data-act="intans">Play answer</button></div>`;
+  setIndicator(Q.target*30,ok);showResult(INT[Q.target],ok);markChips();updateButtons();
+  $('#feedback').innerHTML=fbLine(ok,fbPair(ok,INT[Q.ans],INT[Q.target])+` · ${INTSPK[Q.target]}`,INTFEEL[Q.target]);
 }
 
 /* ================= Quality ================= */
@@ -963,10 +991,8 @@ function playQualityChord(q,root){
 function answerQuality(id){
   Q.ans=id;Q.graded=true;const ok=id===Q.target;record(STATS.qual,Q.target,id);scored(ok,ok?[]:[Q.target]);
   const q=QLIST.find(x=>x.id===Q.target),m=QLIST.find(x=>x.id===id);
-  setKeyName(spell(KL.maj[Q.root],Q.root)+QUAL[Q.target].sfx);setPrompt(ok?'Correct.':'Not quite.');setIndicator(qualAngles()[Q.target],ok);
-  $('#feedback').innerHTML=`<div class="fb-line"><span class="fb-mark ${ok?'ok':'no'}">${ok?'✓':'✗'}</span>
-   <span class="fb-text">${ok?`<b>${q.lab}</b>`:`You chose <b>${m.lab}</b>; it was <b>${q.lab}</b>`}<span class="fb-feel">${q.feel}</span></span>
-   ${ok?'':`<button class="link" data-act="qmine">Play yours</button>`}<button class="link" data-act="qans">Play answer</button></div>`;
+  setKeyName('');showResult(spell(KL.maj[Q.root],Q.root)+QUAL[Q.target].sfx,ok);setIndicator(qualAngles()[Q.target],ok);
+  $('#feedback').innerHTML=fbLine(ok,fbPair(ok,m.lab,q.lab),q.feel);
   markChips();updateButtons();
 }
 
@@ -1003,42 +1029,34 @@ function playContext(withCad){
   ac();stopAll();ensureDrone(Q.key);let t=now()+.12;
   if(withCad)t=playVoicings(cadenceVs(Q.key,Q.ton),t,S.cadLen)+.55;
   const end=playVoicings(Q.vs,t,S.tempo);sounding(end-now());
-  setPrompt(withCad?'Listen to the key, then the chord'+(Q.items.length>1?'s.':'.'):'Listening…');
-  later(end-now(),()=>{if(Q&&!Q.graded&&!pocket)setPrompt(Q.items.length>1?`Choose chord ${Q.answers.length+1} of ${Q.items.length}.`:'Which chord was it?');});
   return end-now();
 }
 function answerContext(id){
   if(Q.answers.length>=Q.items.length)return;Q.answers.push(id);renderSlots();updateButtons();
-  if(Q.answers.length===Q.items.length)gradeContext();else setPrompt(`Choose chord ${Q.answers.length+1} of ${Q.items.length}.`);
+  if(Q.answers.length===Q.items.length)gradeContext();
 }
 function gradeContext(){
   Q.graded=true;let all=true;
   const miss=[];Q.items.forEach((it,i)=>{record(STATS.ctx,it.chord.id,Q.answers[i]);if(Q.answers[i]!==it.chord.id){all=false;miss.push(it.chord.id);}});
-  scored(all,miss);setPrompt(all?'Correct.':Q.items.length>1?'Some misses; compare below.':'Not quite; compare below.');
+  scored(all,miss);showResult(Q.items.length>1?'':Q.items[0].chord.lab,all);
   setIndicator(Q.items[Q.items.length-1].chord.off*30,all);
   renderSlots();markChips();updateButtons();
   if(Q.items.length>1){
     $('#feedback').innerHTML=`<div class="fb-line"><span class="fb-mark ${all?'ok':'no'}">${all?'✓':'✗'}</span><span class="fb-text">`+
       Q.items.map((it,i)=>{const a=Q.answers[i],ok=a===it.chord.id;return ok?`<button class="link" data-act="hear" data-i="${i}" title="${chordName(Q.key,Q.ton,it.chord)}">${it.chord.lab}</button>`
         :`<button class="link" style="color:var(--orange)" data-act="hear" data-i="${i}" title="You chose ${BYID[a].lab}">${BYID[a].lab} → ${it.chord.lab}</button>`;}).join('  ')+
-      `<span class="fb-feel">${all?'All correct. Tap a chord to hear it.':'Orange shows your answer → the real chord. Tap any chord to hear it.'}</span></span></div>
-      <div class="fb-line"><span class="fb-mark"></span><span class="fb-text"><button class="link" data-act="prog">Play the progression</button>${all?'':'  <button class="link" data-act="myprog">Play your version</button>'}</span></div>`;
+      `</span></div>`;
     return;
   }
   const fb=Q.items.map((it,i)=>{const a=Q.answers[i],ok=a===it.chord.id;
-    return `<div class="fb-line"><span class="fb-mark ${ok?'ok':'no'}">${ok?'✓':'✗'}</span>
-     <span class="fb-text">${ok?`<b>${it.chord.lab}</b> (${chordName(Q.key,Q.ton,it.chord)})`:`You chose <b>${BYID[a].lab}</b>; it was <b>${it.chord.lab}</b> (${chordName(Q.key,Q.ton,it.chord)})`}
-     <span class="fb-feel">${it.chord.feel}</span></span>
-     ${ok?`<button class="link" data-act="hear" data-i="${i}">Hear it</button>`:`<button class="link" data-act="mine" data-i="${i}">Play yours</button><button class="link" data-act="hear" data-i="${i}">Play answer</button>`}
-     <button class="link" data-act="home" data-i="${i}">Resolve home</button></div>`;}).join('');
+    return fbLine(ok,fbPair(ok,BYID[a].lab,it.chord.lab)+(ok&&S.nameIt?'':` · ${chordName(Q.key,Q.ton,it.chord)}`),it.chord.feel);}).join('');
   let extra='';
-  if(false)extra=`<div class="fb-line"><span class="fb-mark"></span><span class="fb-text">Whole progression</span><button class="link" data-act="prog">Play it</button>${all?'':'<button class="link" data-act="myprog">Play your version</button>'}</div>`;
   if(all&&Q.items.length===1&&S.nameIt){
-    extra=`<div class="fb-line" id="nameLine"><span class="fb-mark"></span><span class="fb-text">Now spell it. In ${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}, ${Q.items[0].chord.lab} is…
+    extra=`<div class="fb-line" id="nameLine"><span class="fb-mark"></span><span class="fb-text">Spell it
       <span class="namein"><input id="nameIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g. F♯m or Bb7" aria-label="Chord name">
       <span class="ins">${['♭','♯','m','°','ø','maj7','7'].map(x=>`<button class="link" data-act="ins" data-t="${x}">${x}</button>`).join('')}</span></span>
-      <span class="namebtns"><button class="link" data-act="namecheck">Check</button><button class="link" data-act="nameskip">Show me</button></span>
-      <span class="fb-feel" id="nameMsg">Root letter, accidental, then quality. Typing b and # works too.</span></span></div>`;}
+      <span class="namebtns"><button class="link" data-act="namecheck">Check</button><button class="link" data-act="nameskip">Show</button></span>
+      <span class="fb-feel" id="nameMsg"></span></span></div>`;}
   $('#feedback').innerHTML=fb+extra;
   const ni=$('#nameIn');if(ni&&!pocket&&matchMedia('(hover:hover)').matches)ni.focus();
 }
@@ -1132,7 +1150,7 @@ function renderPiano(){
   $('#piano').innerHTML=h;
   document.querySelectorAll('#kTon button').forEach(b=>{b.setAttribute('aria-pressed',K.ton===b.dataset.v);b.classList.toggle('reveal',(K.revealed||K.solved)&&b.dataset.v===s.ton);});
   const ck=$('#kCheck');ck.classList.toggle('ok',K.solved);ck.classList.toggle('no',K.wrong&&!K.solved);
-  ck.textContent=K.solved?'Next song':K.wrong?'Try again':'Check';
+  ck.textContent=K.solved?'Next':'Check';
   $('#kDots').innerHTML=SONGS.map((x,i)=>{const a=i*360/SONGS.length*Math.PI/180;return `<button class="${STATS.key.passed[x.id]?'pass':''}${i===K.idx?' cur':''}${kAllowed(i)?'':' off'}" data-i="${i}" aria-label="Song ${i+1}" title="${x.name}" style="left:${50+47*Math.sin(a)}%;top:${50-47*Math.cos(a)}%"></button>`;}).join('');
 }
 let holds={};
@@ -1146,14 +1164,14 @@ let lastTap={pc:null,t:0};
 function kTap(pc){const t=performance.now();if(lastTap.pc===pc&&t-lastTap.t<450){lastTap={pc:null,t:0};kPick(pc);}else lastTap={pc,t};}
 function kPick(pc){if(K.solved)return;K.sel=pc;K.wrong=false;
   document.querySelectorAll('#piano [data-pc]').forEach(el=>el.classList.toggle('sel',+el.dataset.pc===pc));
-  const ck=$('#kCheck');ck.classList.remove('no');ck.textContent='Check';renderKeyCenter();}
+  const ck=$('#kCheck');ck.classList.remove('no');renderKeyCenter();}
 const kAllowed=i=>{const d=SONGS[i].diff;return S.kDiff==='easy'?d<=2:S.kDiff==='mid'?d===3:S.kDiff==='hard'?d>=4:true;};
 function kRandom(){const ok=SONGS.map((_,i)=>i).filter(i=>kAllowed(i)&&i!==K.idx);if(ok.length)kGo(ok[rnd(ok.length)]);}
 function holdEnd(id){const b=holds[id];if(!b)return;delete holds[id];const t=now();b.gain.setTargetAtTime(0,t,.12);setTimeout(()=>b.disconnect(),900);document.querySelectorAll('#piano .down').forEach(e=>e.classList.remove('down'));}
 function kSetTon(t){if(K.solved)return;K.ton=t;K.wrong=false;renderPiano();renderKeyCenter();}
 function kCheck(){
   const s=SONGS[K.idx];if(K.solved)return kGo(K.idx+1);
-  if(K.sel==null||!K.ton){$('#kSub').textContent=K.sel==null?'Double-tap the home note first.':'Pick maj or min first.';return;}
+  if(K.sel==null||!K.ton){$('#kSub').textContent=K.sel==null?'Double-tap home':'maj or min?';return;}
   STATS.key.att++;const ok=K.sel===K.key&&K.ton===s.ton;
   if(ok){K.solved=true;if(!K.revealed)STATS.key.passed[s.id]=true;}else K.wrong=true;
   if(!K.counted){K.counted=true;scored(ok);}else fx(ok);
@@ -1165,10 +1183,10 @@ function kGo(i,step=1){const was=song.playing,N=SONGS.length;songStop();let j=(i
 
 /* ================= Main flow ================= */
 function nextQuestion(){
-  $('#feedback').innerHTML='';setIndicator(null);
-  if(S.mode==='intervals'){newInterval();setKeyName(DIRW[Q.dir]);renderNodes();playInterval(Q.root,Q.second,Q.dir);setPrompt('Which interval?');}
+  $('#feedback').innerHTML='';setIndicator(null);setPrompt('');
+  if(S.mode==='intervals'){newInterval();setKeyName(DIRW[Q.dir]);renderNodes();playInterval(Q.root,Q.second,Q.dir);setPrompt('');}
   else if(S.mode==='degrees'){newDegree();setKeyName(`${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}`);renderNodes();playDegree(S.cadence);}
-  else if(S.mode==='quality'){if(!newQuality())return;setKeyName('?');renderNodes();playQualityChord(Q.target,Q.root);setPrompt('Which quality?');}
+  else if(S.mode==='quality'){if(!newQuality())return;setKeyName('?');renderNodes();playQualityChord(Q.target,Q.root);setPrompt('');}
   else if(S.mode==='context'){if(!newContext())return;setKeyName(`${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}`);renderNodes();playContext(S.cadence);}
   renderSlots();markChips();updateButtons();
 }
@@ -1176,7 +1194,7 @@ function mainAction(){
   if(pocket)return; if(S.mode==='key')return song.playing?songStop():songStart();
   if(session.done&&(!Q||Q.graded))return newSessionStart();
   if(!Q||Q.graded)return nextQuestion();
-  if(Q.mode==='intervals')playInterval(Q.root,Q.second,Q.dir);else if(Q.mode==='degrees')playDegree(false);else if(Q.mode==='quality')playQualityChord(Q.target,Q.root);else playContext(false);
+  replay();
 }
 function setMode(m){
   if(pocket)togglePocket();stopAll();songStop();if(m==='quality'||m==='key'||m==='intervals')stopDrone();
@@ -1187,8 +1205,8 @@ function setMode(m){
   const isKey=m==='key';
   $('#keyCenter').hidden=!isKey;$('#keyUI').hidden=!isKey;$('#kDots').hidden=!isKey;$('#stdCenter').hidden=isKey;$('#stdControls').hidden=isKey;
   if(isKey){K=kState(S.song||0);if(!kAllowed(K.idx))kGo(K.idx);renderPiano();renderKeyCenter();}
-  else{setKeyName(m==='quality'?'?':'—');setPrompt({intervals:'Tap Start to hear two notes.',degrees:'Tap Start to hear a note in a key.',quality:'Tap Start to hear a chord.',context:'Tap Start to hear chords in a key.'}[m]);$('#readR').textContent=m.toUpperCase();
-    if(!store.get('tf2.seen',false))$('#feedback').innerHTML=`<div class="fb-line"><span class="fb-mark"></span><span class="fb-text">New here? Tap <b>Start</b>, listen, then tap your answer on the circle.<span class="fb-feel">Blue means right, orange means wrong. The ? button explains each mode.</span></span></div>`;}
+  else{setKeyName('');setPrompt('');$('#readR').textContent=m.toUpperCase();
+    if(!store.get('tf2.seen',false))$('#feedback').innerHTML=`<div class="fb-line"><span class="fb-mark"></span><span class="fb-text">Tap ▶ to listen, then tap your answer on the circle.</span></div>`;}
   renderNodes();renderSlots();updateButtons();renderSettings();renderStats();
 }
 
@@ -1200,27 +1218,27 @@ function togglePocket(){
   pocket=!pocket;const b=$('#btnPocket');if(b){b.textContent=pocket?'Stop':'Start';b.classList.toggle('on',pocket);}
   // iOS only lets a page speak after a tap: say nothing now, so the timed answers later are allowed
   if(pocket){try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}ac();pocketStep();}
-  else{stopAll();try{speechSynthesis.cancel()}catch(e){}setPrompt('Hands-free stopped.');}
+  else{stopAll();try{speechSynthesis.cancel()}catch(e){}setPrompt('');}
   keepAwake(pocket);updateButtons();
 }
 function pocketStep(){
   if(!pocket)return;$('#feedback').innerHTML='';setIndicator(null);
   if(S.mode==='intervals'){newInterval();setKeyName(DIRW[Q.dir]);renderNodes();
-    const d=playInterval(Q.root,Q.second,Q.dir);setPrompt('Name it in your head…');
-    later(d+2.5,()=>{if(!pocket)return;say(INTSPK[Q.target]+(Q.dir==='down'?', down':''));setIndicator(Q.target*30,true);flashChip(Q.target);setPrompt(INT[Q.target]);
+    const d=playInterval(Q.root,Q.second,Q.dir);setPrompt('…');
+    later(d+2.5,()=>{if(!pocket)return;say(INTSPK[Q.target]+(Q.dir==='down'?', down':''));setIndicator(Q.target*30,true);flashChip(Q.target);showResult(INT[Q.target],true);
       later(.9,()=>{if(!pocket)return;const d2=playInterval(Q.root,Q.second,Q.dir);later(d2+1.4,pocketStep);});});
   } else if(S.mode==='degrees'&&(S.notes||1)>1){newDegree();setKeyName(`${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}`);renderNodes();renderSlots();
-    const d=playDegree(S.cadence);setPrompt('Name them in your head…');
-    later(d+3.5,()=>{if(!pocket)return;say(Q.items.map(it=>DEGSPK[it.pos]).join(', '));setPrompt(Q.items.map(it=>DEG[it.pos]).join('  '));
+    const d=playDegree(S.cadence);setPrompt('…');
+    later(d+3.5,()=>{if(!pocket)return;say(Q.items.map(it=>DEGSPK[it.pos]).join(', '));showResult(Q.items.map(it=>DEG[it.pos]).join(' '),true);
       setIndicator(Q.items[Q.items.length-1].pos*30,true);const end=playDegreeSeq(now()+1.2);later(end-now()+1.6,pocketStep);});
   } else if(S.mode==='degrees'){newDegree();setKeyName(`${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}`);renderNodes();
-    const d=playDegree(S.cadence);setPrompt('Name it in your head…');
-    later(d+3,()=>{if(!pocket)return;say(DEGSPK[Q.target]);setIndicator(Q.target*30,true);flashChip(Q.target);setPrompt(DEG[Q.target]);
+    const d=playDegree(S.cadence);setPrompt('…');
+    later(d+3,()=>{if(!pocket)return;say(DEGSPK[Q.target]);setIndicator(Q.target*30,true);flashChip(Q.target);showResult(DEG[Q.target],true);
       later(.8,()=>{if(!pocket)return;const b=bus();let t=now()+.05;const base=Q.midi-Q.target;resolvePath(Q.target,Q.ton).forEach((p,i,a)=>{const L=i===a.length-1?1:.4;tone(b,base+p,t,L,.14);t+=L;});later(t-now()+1.4,pocketStep);});});
   } else {
     if(!newContext()){togglePocket();return;}setKeyName(`${keyName(Q.key,Q.ton)} ${tonWord(Q.ton)}`);renderNodes();renderSlots();
-    const d=playContext(S.cadence);setPrompt('Name it in your head…');
-    later(d+3.5,()=>{if(!pocket)return;say(Q.items.map(i=>i.chord.spk).join(', '));setPrompt(Q.items.map(i=>i.chord.lab).join('  '));
+    const d=playContext(S.cadence);setPrompt('…');
+    later(d+3.5,()=>{if(!pocket)return;say(Q.items.map(i=>i.chord.spk).join(', '));showResult(Q.items.map(i=>i.chord.lab).join(' '),true);
       setIndicator(Q.items[Q.items.length-1].chord.off*30,true);
       const end=playVoicings(Q.vs,now()+.9,S.tempo);later(end-now()+1.6,pocketStep);});
   }
@@ -1343,15 +1361,15 @@ $('#nodes').addEventListener('click',e=>{
   const ch=e.target.closest('.chip');if(!ch||pocket)return;const v=ch.dataset.v;
   if(S.mode==='intervals'){if(Q&&!Q.graded)return answerInterval(v);
     if(Q){playDegreeNote(0,intSecond(v));}else{ac();stopAll();const b=bus();tone(b,60,now()+.05,.8,.14);tone(b,60+(+v||12),now()+.8,1,.14);sounding(1.9);}
-    setIndicator(+v*30);setPrompt(`${INT[+v]}: ${INTSPK[+v]}`);}
-  else if(S.mode==='degrees'){if(Q&&!Q.graded)return Q.multi?answerDegreeSeq(v):answerDegree(v);playDegreeNote(v);setIndicator(+v*30);setPrompt(DEG[+v]);if(!Q)$('#feedback').innerHTML=`<div class="fb-line"><span class="fb-mark"></span><span class="fb-text"><b>${DEG[+v]}</b><span class="fb-feel">${DEGFEEL[+v]}</span></span></div>`;}
+    setIndicator(+v*30);showResult(INT[+v],null);}
+  else if(S.mode==='degrees'){if(Q&&!Q.graded)return Q.multi?answerDegreeSeq(v):answerDegree(v);playDegreeNote(v);setIndicator(+v*30);showResult(DEG[+v],null);if(!Q)$('#feedback').innerHTML=`<div class="fb-line"><span class="fb-mark"></span><span class="fb-text"><b>${DEG[+v]}</b><span class="fb-feel">${DEGFEEL[+v]}</span></span></div>`;}
   else if(S.mode==='quality'){if(Q&&!Q.graded)return answerQuality(v);playQualityChord(v,Q?Q.root:0);setIndicator(qualAngles()[v]);}
   else if(S.mode==='context'){
     if(Q&&!Q.graded)return answerContext(v);
     const c=BYID[v],k=Q?Q.key:(S.key==='random'?0:+S.key),ton=curTon();
     if(!Q)setKeyName(`${keyName(k,ton)} ${tonWord(ton)}`);
     ac();stopAll();const e2=playVoicings([voicing((k+c.off)%12,c.q,0,null)],now()+.05,S.tempo);sounding(e2-now());
-    setIndicator(c.off*30);setPrompt(`${c.lab}: ${chordName(k,ton,c)}`);
+    setIndicator(c.off*30);showResult(c.lab,null);
   }
 });
 $('#feedback').addEventListener('click',e=>{
@@ -1375,10 +1393,13 @@ $('#feedback').addEventListener('click',e=>{
   if(act==='qmine')playQualityChord(Q.ans,Q.root);
   if(act==='qans')playQualityChord(Q.target,Q.root);
 });
-$('#btnMain').onclick=mainAction;
+$('#btnMain').onclick=()=>pocket?togglePocket():mainAction();
+$('#cPlay').onclick=mainAction;
+$('#btnReplay').onclick=replay;
+$('#btnRes').onclick=()=>{if(!Q||!Q.graded)return;if(Q.mode==='degrees')playResolve();else{const it=Q.items[Q.items.length-1];playChordInKey(it.chord,it.inv,true);}};
 $('#feedback').addEventListener('keydown',e=>{if(e.target.id==='nameIn'&&e.key==='Enter'){e.preventDefault();checkName();}});
 $('#btnKey').onclick=()=>{if(!Q||pocket)return;ac();stopAll();const e2=playVoicings(cadenceVs(Q.key,Q.ton),now()+.08,S.cadLen);sounding(e2-now());};
-$('#btnUndo').onclick=()=>{if(Q&&!Q.graded&&Q.answers&&Q.answers.length){Q.answers.pop();renderSlots();updateButtons();setPrompt(Q.mode==='degrees'?degAsk():`Choose chord ${Q.answers.length+1} of ${Q.items.length}.`);}};
+$('#btnUndo').onclick=()=>{if(Q&&!Q.graded&&Q.answers&&Q.answers.length){Q.answers.pop();renderSlots();updateButtons();}};
 // one tap clears everything, so keep a copy for a few seconds
 let undoStats=null,undoT=null;
 $('#resetStats').onclick=()=>{const b=$('#resetStats');clearTimeout(undoT);
@@ -1399,6 +1420,13 @@ $('#kTon').addEventListener('click',e=>{const b=e.target.closest('button');if(b)
 $('#kDots').addEventListener('click',e=>{const b=e.target.closest('button');if(b)kGo(+b.dataset.i);});
 $('#piano').addEventListener('pointerdown',e=>{const k=e.target.closest('[data-pc]');if(!k)return;e.preventDefault();k.setPointerCapture&&k.setPointerCapture(e.pointerId);holdStart(+k.dataset.pc,'p'+e.pointerId);kTap(+k.dataset.pc);});
 ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('#piano').addEventListener(ev,e=>holdEnd('p'+e.pointerId)));
+// iOS: stop long-press selection, the callout menu and double-tap zoom on the keys
+['touchstart','touchend','touchmove'].forEach(ev=>$('#piano').addEventListener(ev,e=>{if(e.cancelable)e.preventDefault();},{passive:false}));
+$('#piano').addEventListener('contextmenu',e=>e.preventDefault());
+// never leave a note hanging: any finger lift, cancel, or leaving the app releases it
+['pointerup','pointercancel'].forEach(ev=>window.addEventListener(ev,e=>holdEnd('p'+e.pointerId)));
+const releaseAll=()=>Object.keys(holds).forEach(holdEnd);
+window.addEventListener('blur',releaseAll);document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseAll();});
 
 const WK={q:0,w:2,e:4,r:5,t:7,y:9,u:11,'2':1,'3':3,'5':6,'6':8,'7':10};
 document.addEventListener('keydown',e=>{
@@ -1433,7 +1461,7 @@ function openSheet(){$('#sheet').hidden=false;renderSettings();renderStats();con
 function closeSheet(){$('#sheet').hidden=true;$('#btnGear').focus();}
 $('#btnGear').onclick=openSheet;
 const TOUCH=matchMedia('(hover:none) and (pointer:coarse)').matches;
-const TAPS=[['Tap the circle','Start, or go to the next question after you answer'],['Tap a label','Answer; between questions, hear it']];
+const TAPS=[['▶ or tap the circle','Start, or go to the next question after you answer'],['Tap a label','Answer; after answering, hear any label'],['↻  ⌂  ↩  ↘  →','Replay · hear the key · undo · resolve home · next']];
 const HELP_TOUCH={
   intervals:[...TAPS,['Replay','Hear the two notes again'],['Settings','Up, down, both, or together']],
   degrees:[...TAPS,['Hear key again','Replay the cadence'],['Resolve to 1','Walks the note home after you answer'],['Undo','Take back a note in a melody'],['Pocket mode','Hands-free practice, in Settings']],

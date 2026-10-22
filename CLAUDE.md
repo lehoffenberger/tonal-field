@@ -69,14 +69,24 @@ to my home screen as an installable PWA with offline support.
 - Both themes have light and dark variants that follow the device setting.
 
 ## Design rules
-- Palette is blue, gray and orange. Blue means correct, orange means wrong, everywhere.
-  Nothing is orange at rest: the black hole glow is warm white/sand, selection marks and
-  main buttons use the ink color, and the radio needle/indicator turns blue or orange
-  only after an answer.
+- Palette is blue, gray and orange. Blue means correct, orange means wrong for answer
+  feedback. Orange is also the decorative accent (black hole glow, radio needle, radio
+  buttons, selection marks); the owner likes it and doesn't find it confusing.
+- As little text as possible on the main screen. No routine prompts: the center shows
+  the key name and, after answering, the answer big in blue/orange. Controls are icon
+  buttons (replay, hear the key, undo, resolve home, next) with aria-labels; a ▶ in the
+  center starts. Feedback is one line (your answer struck through → the right one); the
+  "feel" sentence shows only after a miss. Explanations belong in the "?" help panel.
 - Minimal and clean, like Sonofield. Mostly bare text, not boxed buttons.
 - Everything must fit on one screen with no scrolling. The circle resizes to the
   available height. Landscape on phones puts the circle left and controls right.
 - Tap targets are at least 44px; tabs use short labels under 700px wide.
+- Circle labels must pop: Interstellar gives them a halo in the background color and
+  fades star streaks behind them; the radio engraves them, large, on the dial.
+- The radio dial nearly fills the device; landscape centers the dial + controls pair.
+- Piano keys: no text selection or callouts (-webkit-user-select / -webkit-touch-callout),
+  touch defaults blocked (stops iOS double-tap zoom), and any finger lift, blur or app
+  switch releases held notes.
 - No overlapping text, at any screen size, in either theme.
 - Settings live in a slide-out panel behind the gear icon; help lives behind "?".
 - Abbreviate quality names (maj, min, dim, aug).
