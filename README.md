@@ -15,3 +15,8 @@ One self-contained HTML file, all sound synthesized with the Web Audio API.
 ## Updating
 Edit `index.html`, bump `VERSION` in `sw.js`, push. The phone picks up the new
 version the next time the app is opened online (sometimes it takes a second launch).
+
+## Credits
+- Piano: [Salamander Grand Piano V3](https://archive.org/details/SalamanderGrandPianoV3) by Alexander Holm,
+  CC BY 3.0, via the `@audio-samples/piano-mp3-velocity8` package (MIT). Trimmed to mono clips in `piano/`.
+- Spoken answers in `voice/`: generated with [Flite](http://www.festvox.org/flite/) (CMU, BSD-style license), voice "slt".

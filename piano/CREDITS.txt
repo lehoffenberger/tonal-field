@@ -1,0 +1,4 @@
+Piano samples: Salamander Grand Piano V3 by Alexander Holm, licensed CC BY 3.0
+(https://creativecommons.org/licenses/by/3.0/). Source: https://archive.org/details/SalamanderGrandPianoV3
+MP3 versions via the @audio-samples/piano-mp3-velocity8 package by Jan Forst (MIT).
+Trimmed to 4.5 s, faded and converted to mono for Tonal Field.

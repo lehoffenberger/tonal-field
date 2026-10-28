@@ -25,6 +25,11 @@ to my home screen as an installable PWA with offline support.
 1. Degrees: a drone/cadence sets the key, then one note plays; identify the scale
    degree on a 12-position circle (1 3 5 / scale / all 12; major or minor; 1–2 octaves).
    "Notes per question" 2–4 turns it into melodic dictation (answer in order, with Undo).
+   Answers resolve by holding the degree long, then walking home (5 in C: long G, A B C).
+1b. Sing: the key plays, a degree shows big (orange on the circle); sing it. Mic pitch
+   detection (McLeod-style normalized autocorrelation, `detectPitch`) drives a live needle;
+   ~0.6 s within ±45 cents passes, any octave. Skip counts as a miss. The mic is only open
+   on this tab (audioSession 'play-and-record' while open, back to 'playback' after).
 2. Chord quality: maj, min, dim, aug, plus optional maj7, 7, m7, ø7, °7, played as
    block chord, arpeggio, or both.
 3. Chords in a key: a cadence sets the key, then 1–4 chords play; answer with Roman
@@ -39,7 +44,8 @@ to my home screen as an installable PWA with offline support.
    songs in four styles, difficulty 1–5. Tap/hold piano keys to test notes; double-tap
    (or press a key twice) to choose home; pick maj/min, then check. Each visit moves the
    song to a random key (setting). Difficulty filter, tempo, random song in Settings.
-   Song dots sit in a ring around the circle.
+   Song dots sit in a ring around the circle. After two wrong checks a bulb button plays
+   the song's home chord as a hint.
 
 ## Other features
 - Stats with confusion tracking. Weighting uses each item's last 20 tries (`h` array),
@@ -52,10 +58,16 @@ to my home screen as an installable PWA with offline support.
   Safari and the home-screen app have separate storage.
 - iOS: `navigator.audioSession.type='playback'` so sound ignores the silent switch; the
   AudioContext is resumed from any non-running state (calls, app switching).
-- Pocket mode: hands-free, speaks the answers using speech synthesis. Starting it says
-  "Hands-free on" from the tap (iOS needs the first speech to come from a gesture). Each
-  answer is spoken, then (on speech end, with a timeout fallback) Web Audio is resumed,
-  since iOS pauses it while speaking, and the answer is played.
+- Pocket mode (Intervals, Degrees, Chord quality, Chords in a key): hands-free. Each answer
+  is spoken, then played. "Answer voice": Recorded (default) plays clips from `voice/`
+  through Web Audio, so it keeps working with the screen off; Phone uses speechSynthesis
+  (iOS stops it when the screen locks; first words must come from a tap); Off = music only.
+  Voice clips were made with Flite (ffmpeg's `flite` filter, voice "slt"); to add a phrase,
+  generate `voice/<words-with-dashes>.mp3` the same way and add it to VOICE_FILES in sw.js.
+- After a miss the app plays your answer, then the right one ("Hear both", Settings).
+- Sound: Grand piano uses Salamander Grand Piano samples in `piano/` (every 3 semitones,
+  pitch-shifted between; credits in piano/CREDITS.txt). A convolver reverb sits on the
+  master bus (per-sound amount, toggle in Settings).
 - Free play: tap a chord or degree between questions to hear it.
 - Settings and stats are saved in localStorage (wrapped in try/catch).
 - Keyboard shortcuts for every mode, listed in the "?" help panel.
@@ -86,7 +98,10 @@ to my home screen as an installable PWA with offline support.
 - Tap targets are at least 44px; tabs use short labels under 700px wide.
 - Circle labels must pop: Interstellar gives them a halo in the background color and
   fades star streaks behind them; the radio engraves them, large, on the dial.
-- The radio dial nearly fills the device; landscape centers the dial + controls pair.
+- The radio dial nearly fills the device; the body spans nearly the full width; landscape
+  centers the dial + controls pair. Realism: plastic grain, screen bezel and glass glare,
+  side volume wheel, perforated grille, rubber round keys (orange for Next).
+- Play buttons (start, Find the key) sit exactly at the circle's center.
 - Piano keys: no text selection or callouts (-webkit-user-select / -webkit-touch-callout),
   touch defaults blocked (stops iOS double-tap zoom), and any finger lift, blur or app
   switch releases held notes.

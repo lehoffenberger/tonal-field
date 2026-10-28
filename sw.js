@@ -1,8 +1,11 @@
 // Tonal Field service worker: offline app shell + cached Google Fonts.
 // Bump VERSION whenever index.html or the icons change so phones pick up the update.
-const VERSION = 'v4';
+const VERSION = 'v5';
 const SHELL = `tf-shell-${VERSION}`;
 const FONTS = 'tf-fonts';
+// voice clips and piano samples: kept across versions (they rarely change)
+const MEDIA = 'tf-media-1';
+const VOICE_FILES = ["voice/augmented.mp3", "voice/diminished-seven.mp3", "voice/diminished.mp3", "voice/dominant-seven.mp3", "voice/down.mp3", "voice/five-of-five.mp3", "voice/five-of-six.mp3", "voice/five-of-two.mp3", "voice/five-seven-of-four.mp3", "voice/five-seven.mp3", "voice/five.mp3", "voice/flat-seven.mp3", "voice/flat-six.mp3", "voice/flat-three.mp3", "voice/flat-two.mp3", "voice/four-major-seven.mp3", "voice/four-minor-seven.mp3", "voice/four.mp3", "voice/half-diminished.mp3", "voice/hands-free-on.mp3", "voice/major-five.mp3", "voice/major-four.mp3", "voice/major-one.mp3", "voice/major-second.mp3", "voice/major-seven.mp3", "voice/major-seventh.mp3", "voice/major-sixth.mp3", "voice/major-third.mp3", "voice/major.mp3", "voice/minor-five.mp3", "voice/minor-four.mp3", "voice/minor-second.mp3", "voice/minor-seven.mp3", "voice/minor-seventh.mp3", "voice/minor-sixth.mp3", "voice/minor-third.mp3", "voice/minor.mp3", "voice/octave.mp3", "voice/one-major-seven.mp3", "voice/one-minor-seven.mp3", "voice/one.mp3", "voice/perfect-fifth.mp3", "voice/perfect-fourth.mp3", "voice/seven-diminished-seven.mp3", "voice/seven-diminished.mp3", "voice/seven-dominant-seven.mp3", "voice/seven-half-diminished.mp3", "voice/seven.mp3", "voice/sharp-four.mp3", "voice/six-major-seven.mp3", "voice/six-minor-seven.mp3", "voice/six.mp3", "voice/three-major-seven.mp3", "voice/three-minor-seven.mp3", "voice/three.mp3", "voice/tritone.mp3", "voice/two-diminished.mp3", "voice/two-half-diminished.mp3", "voice/two-minor-seven.mp3", "voice/two.mp3"];
 const SHELL_FILES = [
   './',
   'index.html',
@@ -29,6 +32,7 @@ async function precacheFonts() {
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(SHELL).then(c => c.addAll(SHELL_FILES))
+      .then(() => caches.open(MEDIA).then(c => c.addAll(VOICE_FILES)).catch(() => {}))
       .then(() => precacheFonts().catch(() => {}))
       .then(() => self.skipWaiting())
   );
@@ -72,6 +76,18 @@ self.addEventListener('fetch', e => {
         return res;
       }).catch(() => caches.match('index.html', { ignoreSearch: true }))
     );
+    return;
+  }
+
+  // Voice clips and piano samples: cache first, saved on first use (so the grand piano works offline once heard).
+  if (url.pathname.includes('/voice/') || url.pathname.includes('/piano/')) {
+    e.respondWith(caches.open(MEDIA).then(async cache => {
+      const hit = await cache.match(req);
+      if (hit) return hit;
+      const res = await fetch(req);
+      if (res.ok) cache.put(req, res.clone());
+      return res;
+    }));
     return;
   }
 
