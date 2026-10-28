@@ -1,6 +1,6 @@
 // Tonal Field service worker: offline app shell + cached Google Fonts.
 // Bump VERSION whenever index.html or the icons change so phones pick up the update.
-const VERSION = 'v5';
+const VERSION = 'v6';
 const SHELL = `tf-shell-${VERSION}`;
 const FONTS = 'tf-fonts';
 // voice clips and piano samples: kept across versions (they rarely change)
@@ -13,7 +13,9 @@ const SHELL_FILES = [
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/icon-maskable-512.png',
-  'icons/apple-touch-icon.png'
+  'icons/apple-touch-icon.png',
+  'icons/favicon-32.png',
+  'icons/favicon-16.png'
 ];
 // Same URL as the stylesheet link in index.html.
 const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Sora:wght@300;400;500;600&family=VT323&family=Space+Mono:wght@400;700&display=swap';
