@@ -657,12 +657,12 @@ const posClass=(pos,ton)=>pos===0?'home':(SCALE[ton].includes(pos)?'dia':'chrom'
 
 /* ================= Storage ================= */
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-const DEF={mode:'degrees',skin:'space',sound:'auto',vol:0.8,ton:'maj',key:'random',degSet:'scale',range:1,
+const DEF={mode:'degrees',skin:'space',sound:'auto',vol:1,ton:'maj',key:'random',degSet:'scale',range:1,
   drone:true,droneVol:0.5,cadence:true,cadLen:0.6,noteLen:1.2,
   quals:{maj:true,min:true,dim:true,aug:true,maj7:false,dom7:false,m7:false,hd7:false,dim7:false},qualPlay:'both',qualLen:1.4,
   groups:{tri:true,sev:false,bor:false,sec:false,mtri:true,mharm:true,msev:false,mcol:false},len:1,inv:false,nameIt:true,bass:false,tempo:1.2,song:0,
   intSet:'major',intDir:'up',notes:1,prog:'musical',goal:0,auto:false,buzz:true,kDiff:'all',kTempo:1,kKey:'random',
-  voice:'recorded',reverb:true,both:true,singSet:'scale',singDrone:false};
+  voice:'recorded',reverb:true,ctxPlay:'block',both:true,singSet:'scale',singDrone:false};
 let S=Object.assign({},DEF,store.get('tf2.settings',{}));
 S.groups=Object.assign({},DEF.groups,S.groups); S.quals=Object.assign({},DEF.quals,S.quals);
 const freshStats=()=>({deg:{},qual:{},ctx:{},int:{},sing:{},key:{att:0,passed:{}}});
@@ -677,15 +677,18 @@ let ctx=null,master=null,analyser=null,buses=[],drone=null,timers=[],noiseBuf=nu
 // a small synthetic room: decaying stereo noise as the impulse response
 function makeIR(sec){const sr=ctx.sampleRate,n=Math.floor(sr*sec),b=ctx.createBuffer(2,n,sr);
   for(let ch=0;ch<2;ch++){const d=b.getChannelData(ch);for(let i=0;i<n;i++){const k=i/n;d[i]=(Math.random()*2-1)*Math.pow(1-k,3.4)*Math.min(1,i/(sr*.01));}}return b;}
-const WET={glass:.32,piano:.2,grand:.24,sine:.1};
+const WET={glass:.16,piano:.12,grand:.14,sine:.06};
 const wetLevel=()=>S.reverb===false?0:(WET[timbre()]||.15);
 function setWet(){if(wet)wet.gain.setTargetAtTime(wetLevel(),ctx.currentTime,.1);}
 function ac(){
   if(!ctx){
     try{if(navigator.audioSession&&S.mode!=='sing')navigator.audioSession.type='playback'}catch(e){}
     ctx=new (window.AudioContext||window.webkitAudioContext)();
-    comp=ctx.createDynamicsCompressor(); comp.threshold.value=-16; comp.ratio.value=3;
-    master=ctx.createGain(); master.gain.value=S.vol; master.connect(comp);
+    // limiter: lets the app run ~10 dB hotter than before without clipping
+    comp=ctx.createDynamicsCompressor(); comp.threshold.value=-9; comp.knee.value=3; comp.ratio.value=14; comp.attack.value=.003; comp.release.value=.18;
+    // trim the deep lows phone speakers can't play anyway; they only eat headroom
+    const lows=ctx.createBiquadFilter();lows.type='lowshelf';lows.frequency.value=110;lows.gain.value=-4;lows.connect(comp);
+    master=ctx.createGain(); master.gain.value=S.vol; master.connect(lows);
     try{const rv=ctx.createConvolver();rv.buffer=makeIR(2.4);wet=ctx.createGain();wet.gain.value=wetLevel();master.connect(rv);rv.connect(wet);wet.connect(comp);}catch(e){wet=null;}
     analyser=ctx.createAnalyser(); analyser.fftSize=2048; scopeBuf=new Float32Array(analyser.fftSize);
     comp.connect(ctx.destination); comp.connect(analyser);
@@ -701,6 +704,8 @@ function clearTimers(){timers.forEach(clearTimeout);timers=[];}
 function fadeKill(b){try{const t=ctx.currentTime;b.gain.cancelScheduledValues(t);b.gain.setValueAtTime(b.gain.value,t);b.gain.linearRampToValueAtTime(0,t+0.06);setTimeout(()=>b.disconnect(),160)}catch(e){}}
 function stopAll(){clearTimers();$('#field').classList.remove('sounding');if(!ctx)return;buses.forEach(fadeKill);buses=[];}
 function bus(){const b=ctx.createGain();b.connect(master);buses.push(b);return b;}
+// overall note level, set so a chord peaks just under full scale
+const LOUD=2.6;
 const timbre=()=>S.sound==='auto'?(S.skin==='space'?'glass':'sine'):S.sound;
 /* ---- sampled grand piano (Salamander Grand Piano V3, CC BY 3.0, every 3 semitones A1–C7) ---- */
 const GRAND={},GRAND_NOTES=[...Array(22).keys()].map(i=>33+i*3);let grandLoading=null;
@@ -711,7 +716,7 @@ function loadGrand(){if(grandLoading)return grandLoading;ac();
 function grandTone(b,m,t,dur,vel){
   const s=Math.max(33,Math.min(96,33+3*Math.round((m-33)/3)));const buf=GRAND[s];if(!buf)return false;
   const src=ctx.createBufferSource(),g=ctx.createGain();src.buffer=buf;src.playbackRate.value=Math.pow(2,(m-s)/12);
-  const v=vel*4;g.gain.setValueAtTime(v,t);g.gain.setTargetAtTime(.0001,t+dur,.22);src.connect(g);g.connect(b);src.start(t);src.stop(t+Math.min(buf.duration,dur+1.6));return true;}
+  const v=vel*4*LOUD;g.gain.setValueAtTime(v,t);g.gain.setTargetAtTime(.0001,t+dur,.22);src.connect(g);g.connect(b);src.start(t);src.stop(t+Math.min(buf.duration,dur+1.6));return true;}
 function tone(b,m,t,dur,vel){
   const kind0=timbre();if(kind0==='grand'&&grandTone(b,m,t,dur,vel))return;
   const kind=kind0==='grand'?'piano':kind0, f=mf(m), g=ctx.createGain(); g.connect(b);
@@ -721,14 +726,14 @@ function tone(b,m,t,dur,vel){
     const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=.4; lp.frequency.setValueAtTime(Math.min(9000,f*9),t); lp.frequency.setTargetAtTime(Math.max(500,f*2.6),t,.45); lp.connect(g); dest=lp;
     add('triangle',f,1); add('sine',f*2,.22); add('sawtooth',f,.05,5);
   } else if(kind==='sine'){
-    add('sine',f,1); add('sine',f*2,.07);
-    const l=ctx.createOscillator(); l.frequency.value=5.3; const lg=ctx.createGain(); lg.gain.value=f*.0028; l.connect(lg); oscs.forEach(o=>lg.connect(o.frequency)); oscs.push(l);
+    add('sine',f,1); add('sine',f*2,.24); add('sine',f*3,.09);
+    const l=ctx.createOscillator(); l.frequency.value=5.3; const lg=ctx.createGain(); lg.gain.value=f*.0012; l.connect(lg); oscs.forEach(o=>lg.connect(o.frequency)); oscs.push(l);
     atk=.02; sus=.62; tau=.9; rel=.16; scale=.85;
   } else {
-    add('sine',f,.55,-7); add('sine',f,.55,7); add('sine',f*2,.16); add('sine',f*3,.05,3);
+    add('sine',f,.55,-2); add('sine',f,.55,2); add('sine',f*2,.3); add('sine',f*3,.13,2); add('sine',f*4,.06);
     atk=.045; sus=.55; tau=1.1; rel=.35; scale=.72;
   }
-  const v=vel*scale;
+  const v=vel*scale*LOUD;
   g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(v,t+atk);
   g.gain.setTargetAtTime(v*sus,t+atk,tau); g.gain.setTargetAtTime(.0001,t+dur,rel);
   oscs.forEach(o=>{o.start(t);o.stop(t+dur+rel*7+.2)});
@@ -739,8 +744,8 @@ function kick(b,t,vel){const o=ctx.createOscillator();o.frequency.setValueAtTime
 function startDrone(pc){
   stopDrone(); ac(); const t=ctx.currentTime;
   const g=ctx.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(S.droneVol*.2,t+1.5);
-  const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=700; lp.connect(g); g.connect(master);
-  const oscs=[[36+pc,'sine',1],[48+pc,'triangle',.45],[43+pc,'sine',.32]].map(([m,type,lv])=>{const o=ctx.createOscillator();o.type=type;o.frequency.value=mf(m);const og=ctx.createGain();og.gain.value=lv;o.connect(og).connect(lp);o.start();return o;});
+  const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1500; lp.connect(g); g.connect(master);
+  const oscs=[[48+pc,'sine',1],[60+pc,'triangle',.4],[55+pc,'sine',.3]].map(([m,type,lv])=>{const o=ctx.createOscillator();o.type=type;o.frequency.value=mf(m);const og=ctx.createGain();og.gain.value=lv;o.connect(og).connect(lp);o.start();return o;});
   drone={g,oscs,pc};
 }
 function stopDrone(){
@@ -750,13 +755,16 @@ function stopDrone(){
 }
 function voicing(rootPc,q,inv,prev){
   const pcs=QUAL[q].iv.map(i=>(rootPc+i)%12), bpc=pcs[inv%pcs.length];
-  const bass=40+((bpc-4+12)%12);
-  const low=prev?Math.max(53,Math.min(61,Math.round(prev-5))):55;
+  const low=prev?Math.max(58,Math.min(66,Math.round(prev-5))):60;
   const upper=pcs.map(pc=>low+((pc-low%12)%12+12)%12).sort((a,b)=>a-b);
+  // bass: that pitch class, the highest one at least 3 semitones under the chord
+  let bass=48+bpc;while(bass>upper[0]-3)bass-=12;
   return {bass,upper,center:upper.reduce((a,b)=>a+b,0)/upper.length};
 }
 function voiceSeq(k,items){let prev=null;return items.map(it=>{const v=voicing((k+it.chord.off)%12,it.chord.q,it.inv,prev);prev=v.center;return v;});}
-function playVoicings(vs,start,dur,b){b=b||bus();let t=start;vs.forEach(v=>{v.upper.forEach(m=>tone(b,m,t,dur*.92,.1));tone(b,v.bass,t,dur*.92,S.bass?.27:.16);t+=dur;});return t;}
+function playVoicings(vs,start,dur,b){b=b||bus();let t=start;vs.forEach(v=>{tone(b,v.bass,t,dur*.92,S.bass?.27:.16);v.upper.forEach((m,i)=>tone(b,m,t+(i+1)*.022,dur*.92-.03*(i+1),.1));t+=dur;});return t;}
+// each chord's notes one at a time (bass up), then together: for hearing what's inside
+function playSpelled(vs,t,dur){const b=bus();vs.forEach(v=>{[v.bass,...v.upper].forEach((m,i)=>tone(b,m,t+i*.26,.5,i?.12:.15));t+=(v.upper.length+1)*.26+.15;t=playVoicings([v],t,dur,b)+.1;});return t;}
 const CAD={maj:['I','IV','V','I'],min:['m:i','m:iv','m:V','m:i']};
 const cadenceVs=(k,ton)=>voiceSeq(k,CAD[ton].map(id=>({chord:BYID[id],inv:0})));
 function sounding(sec){$('#field').classList.add('sounding');later(sec,()=>$('#field').classList.remove('sounding'));}
@@ -998,7 +1006,7 @@ function fx(ok){
 }
 
 /* ================= Degrees ================= */
-const tonicBase=k=>55+((k-7+12)%12);
+const tonicBase=k=>57+((k-9+12)%12);
 function newDegree(){
   const f=focusList('degrees');let ton,set;
   if(f){ton=f[rnd(f.length)].split(':')[0];set=f.filter(x=>x.startsWith(ton+':')).map(x=>+x.split(':')[1]);}
@@ -1055,7 +1063,7 @@ function newInterval(){
   const f=focusList('intervals'),set=f?f.map(Number):intSet();
   const p=pickWeighted(set,x=>String(x),STATS.int,last.int);last.int=String(p);
   const dir=S.intDir==='mix'?(Math.random()<.5?'up':'down'):S.intDir,n=p||12;
-  const root=dir==='down'?62+rnd(9):53+rnd(9);
+  const root=dir==='down'?66+rnd(9):57+rnd(9);
   Q={mode:'intervals',target:p,dir,root,second:dir==='down'?root-n:root+n,graded:false};return true;
 }
 const intSecond=p=>Q.dir==='down'?Q.root-(+p||12):Q.root+(+p||12);
@@ -1196,7 +1204,7 @@ function newContext(){
 function playContext(withCad){
   ac();stopAll();ensureDrone(Q.key);let t=now()+.12;
   if(withCad)t=playVoicings(cadenceVs(Q.key,Q.ton),t,S.cadLen)+.55;
-  const end=playVoicings(Q.vs,t,S.tempo);sounding(end-now());
+  const end=S.ctxPlay==='both'?playSpelled(Q.vs,t,S.tempo):playVoicings(Q.vs,t,S.tempo);sounding(end-now());
   return end-now();
 }
 function answerContext(id){
@@ -1295,7 +1303,7 @@ function scheduleLoop(s,t0){
       [0,2].forEach(x=>{tone(b,v.bass,t+x*spb,spb*1.8,.12);kick(b,t+x*spb,.22);});}
     else if(s.style==='waltz'){tone(b,v.bass,t,spb*.9,.12);[1,2].forEach(x=>v.upper.forEach(m=>tone(b,m,t+x*spb,spb*.75,.045)));}
     else {for(let x=0;x<4;x++)v.upper.forEach(m=>tone(b,m,t+x*spb,spb*.9,.04));[0,2].forEach(x=>tone(b,v.bass,t+x*spb,spb*1.9,.11));}
-    s.mel[bi].forEach(n=>{const m=67+((K.key+n.rel-7)%12+12)%12;tone(b,m,t+n.beat*spb,n.len*spb*.95,.075);});
+    s.mel[bi].forEach(n=>{const m=72+((K.key+n.rel)%12+12)%12;tone(b,m,t+n.beat*spb,n.len*spb*.95,.075);});
   });
 }
 const PLAYICON='<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg>';
@@ -1513,7 +1521,7 @@ function renderSettings(){
     h+=tonRow+keySelect();
     const tons=S.ton==='mix'?['maj','min']:[S.ton];
     tons.forEach(t=>{h+=gt(`Chords in ${tonWord(t)} keys`)+GROUPS.filter(g=>g.ton===t).map(g=>`<div class="row"><label for="g_${g.id}">${g.t}<small>${g.s}</small></label><input type="checkbox" id="g_${g.id}" data-group="${g.id}" ${S.groups[g.id]?'checked':''}></div>`).join('');});
-    h+=gt('Question')+rowSeg('Chords per question','len',[[1,'1'],[2,'2'],[3,'3'],[4,'4']])+rowSeg('Progressions','prog',[['musical','Musical'],['random','Random']],'Musical moves like real songs; random is harder')+rowChk('Inversions','inv','Bass may be the 3rd, 5th or 7th')+rowChk('Name the chord too','nameIt','Single-chord questions');
+    h+=gt('Question')+rowSeg('Playback','ctxPlay',[['block','Together'],['both','Notes, then together']],'Hear each chord tone before the chord')+rowSeg('Chords per question','len',[[1,'1'],[2,'2'],[3,'3'],[4,'4']])+rowSeg('Progressions','prog',[['musical','Musical'],['random','Random']],'Musical moves like real songs; random is harder')+rowChk('Inversions','inv','Bass may be the 3rd, 5th or 7th')+rowChk('Name the chord too','nameIt','Single-chord questions');
     h+=gt('Sound')+droneRows+cadRows+rowRange('Chord length','tempo',.6,2.4,.1)+rowChk('Louder bass','bass');
     h+=pocketRow();
   } else {

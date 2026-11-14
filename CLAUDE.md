@@ -69,6 +69,13 @@ to my home screen as an installable PWA with offline support.
   pitch-shifted between; credits in piano/CREDITS.txt). A convolver reverb sits on the
   master bus (per-sound amount, toggle in Settings).
 - Free play: tap a chord or degree between questions to hear it.
+- Loudness and clarity (tuned for phone speakers, which play almost nothing under ~500 Hz):
+  notes run hot (`LOUD`) into a limiter (compressor at -9 dB, ratio 14) after a -4 dB low
+  shelf; chords peak around -2 dBFS. Chords sit around middle C (upper notes from ~C4, bass
+  the octave below, always under the chord); the drone is C3/G3/C4; timbres carry
+  harmonics (no heavy detune or vibrato) and reverb is light. Block chords roll bottom to
+  top by ~22 ms per note. Chords in a key has "Notes, then together" playback.
+  Measure changes with an OfflineAudioContext render plus a 500 Hz high-pass "phone".
 - Settings and stats are saved in localStorage (wrapped in try/catch).
 - Keyboard shortcuts for every mode, listed in the "?" help panel.
 
