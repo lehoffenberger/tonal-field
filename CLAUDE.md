@@ -70,12 +70,17 @@ to my home screen as an installable PWA with offline support.
   master bus (per-sound amount, toggle in Settings).
 - Free play: tap a chord or degree between questions to hear it.
 - Loudness and clarity (tuned for phone speakers, which play almost nothing under ~500 Hz):
-  notes run hot (`LOUD`) into a limiter (compressor at -9 dB, ratio 14) after a -4 dB low
-  shelf; chords peak around -2 dBFS. Chords sit around middle C (upper notes from ~C4, bass
-  the octave below, always under the chord); the drone is C3/G3/C4; timbres carry
-  harmonics (no heavy detune or vibrato) and reverb is light. Block chords roll bottom to
-  top by ~22 ms per note. Chords in a key has "Notes, then together" playback.
-  Measure changes with an OfflineAudioContext render plus a 500 Hz high-pass "phone".
+  levels are set with headroom (`LOUD` for chord notes, `SOLO` for single notes, chord
+  notes scaled by 1/sqrt(count)) so everything peaks around -5 to -9 dBFS and the limiter
+  (threshold -1.5 dB) never engages. Don't push levels into the limiter: browser
+  compressors add automatic make-up gain, so a low threshold boosts then crushes the sound
+  (audible pumping/saturation; this happened once). No detuned unison oscillators (they
+  beat: a single glass note swung 9 dB); the drone is tonic + fifth only, so it doesn't
+  double chord tones. Chords sit around middle C (bass the octave below, always under the
+  chord), reverb is light, block chords roll bottom to top ~22 ms per note, and Chords in a
+  key has "Notes, then together" playback. Measure with an OfflineAudioContext render:
+  compare against a render with the limiter neutralized (threshold 0, ratio 1, reverb off)
+  and check peaks, plus a 500 Hz high-pass "phone" for speaker loudness.
 - Settings and stats are saved in localStorage (wrapped in try/catch).
 - Keyboard shortcuts for every mode, listed in the "?" help panel.
 

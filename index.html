@@ -684,8 +684,9 @@ function ac(){
   if(!ctx){
     try{if(navigator.audioSession&&S.mode!=='sing')navigator.audioSession.type='playback'}catch(e){}
     ctx=new (window.AudioContext||window.webkitAudioContext)();
-    // limiter: lets the app run ~10 dB hotter than before without clipping
-    comp=ctx.createDynamicsCompressor(); comp.threshold.value=-9; comp.knee.value=3; comp.ratio.value=14; comp.attack.value=.003; comp.release.value=.18;
+    // safety limiter only: levels are set so it rarely engages (browser compressors add their own
+    // make-up gain, so a low threshold here would boost everything and then crush it)
+    comp=ctx.createDynamicsCompressor(); comp.threshold.value=-1.5; comp.knee.value=0; comp.ratio.value=20; comp.attack.value=.002; comp.release.value=.12;
     // trim the deep lows phone speakers can't play anyway; they only eat headroom
     const lows=ctx.createBiquadFilter();lows.type='lowshelf';lows.frequency.value=110;lows.gain.value=-4;lows.connect(comp);
     master=ctx.createGain(); master.gain.value=S.vol; master.connect(lows);
@@ -705,7 +706,9 @@ function fadeKill(b){try{const t=ctx.currentTime;b.gain.cancelScheduledValues(t)
 function stopAll(){clearTimers();$('#field').classList.remove('sounding');if(!ctx)return;buses.forEach(fadeKill);buses=[];}
 function bus(){const b=ctx.createGain();b.connect(master);buses.push(b);return b;}
 // overall note level, set so a chord peaks just under full scale
-const LOUD=2.6;
+const LOUD=1.6;
+// single notes get more level than each note of a chord, so they match a chord's loudness
+const SOLO=.26;
 const timbre=()=>S.sound==='auto'?(S.skin==='space'?'glass':'sine'):S.sound;
 /* ---- sampled grand piano (Salamander Grand Piano V3, CC BY 3.0, every 3 semitones A1–C7) ---- */
 const GRAND={},GRAND_NOTES=[...Array(22).keys()].map(i=>33+i*3);let grandLoading=null;
@@ -730,7 +733,7 @@ function tone(b,m,t,dur,vel){
     const l=ctx.createOscillator(); l.frequency.value=5.3; const lg=ctx.createGain(); lg.gain.value=f*.0012; l.connect(lg); oscs.forEach(o=>lg.connect(o.frequency)); oscs.push(l);
     atk=.02; sus=.62; tau=.9; rel=.16; scale=.85;
   } else {
-    add('sine',f,.55,-2); add('sine',f,.55,2); add('sine',f*2,.3); add('sine',f*3,.13,2); add('sine',f*4,.06);
+    add('sine',f,1); add('sine',f*2,.3); add('sine',f*3,.13); add('sine',f*4,.05,4);
     atk=.045; sus=.55; tau=1.1; rel=.35; scale=.72;
   }
   const v=vel*scale*LOUD;
@@ -745,7 +748,7 @@ function startDrone(pc){
   stopDrone(); ac(); const t=ctx.currentTime;
   const g=ctx.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(S.droneVol*.2,t+1.5);
   const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1500; lp.connect(g); g.connect(master);
-  const oscs=[[48+pc,'sine',1],[60+pc,'triangle',.4],[55+pc,'sine',.3]].map(([m,type,lv])=>{const o=ctx.createOscillator();o.type=type;o.frequency.value=mf(m);const og=ctx.createGain();og.gain.value=lv;o.connect(og).connect(lp);o.start();return o;});
+  const oscs=[[48+pc,'triangle',.8],[55+pc,'sine',.22]].map(([m,type,lv])=>{const o=ctx.createOscillator();o.type=type;o.frequency.value=mf(m);const og=ctx.createGain();og.gain.value=lv;o.connect(og).connect(lp);o.start();return o;});
   drone={g,oscs,pc};
 }
 function stopDrone(){
@@ -762,7 +765,7 @@ function voicing(rootPc,q,inv,prev){
   return {bass,upper,center:upper.reduce((a,b)=>a+b,0)/upper.length};
 }
 function voiceSeq(k,items){let prev=null;return items.map(it=>{const v=voicing((k+it.chord.off)%12,it.chord.q,it.inv,prev);prev=v.center;return v;});}
-function playVoicings(vs,start,dur,b){b=b||bus();let t=start;vs.forEach(v=>{tone(b,v.bass,t,dur*.92,S.bass?.27:.16);v.upper.forEach((m,i)=>tone(b,m,t+(i+1)*.022,dur*.92-.03*(i+1),.1));t+=dur;});return t;}
+function playVoicings(vs,start,dur,b){b=b||bus();let t=start;vs.forEach(v=>{const k=Math.sqrt(3/v.upper.length);tone(b,v.bass,t,dur*.92,(S.bass?.27:.16)*k);v.upper.forEach((m,i)=>tone(b,m,t+(i+1)*.022,dur*.92-.03*(i+1),.1*k));t+=dur;});return t;}
 // each chord's notes one at a time (bass up), then together: for hearing what's inside
 function playSpelled(vs,t,dur){const b=bus();vs.forEach(v=>{[v.bass,...v.upper].forEach((m,i)=>tone(b,m,t+i*.26,.5,i?.12:.15));t+=(v.upper.length+1)*.26+.15;t=playVoicings([v],t,dur,b)+.1;});return t;}
 const CAD={maj:['I','IV','V','I'],min:['m:i','m:iv','m:V','m:i']};
@@ -1015,7 +1018,7 @@ function newDegree(){
   for(let i=0;i<n;i++){const pos=pickWeighted(set,p=>ton+':'+p,STATS.deg,last.deg);last.deg=ton+':'+pos;items.push({pos,midi:base+pos+(S.range===2&&Math.random()<.5?12:0)});}
   Q={mode:'degrees',ton,key,items,target:items[0].pos,midi:items[0].midi,answers:[],multi:n>1,graded:false}; return true;
 }
-function playDegreeSeq(t){const b=bus(),L=Q.multi?Math.min(S.noteLen,.9):S.noteLen;Q.items.forEach(it=>{tone(b,it.midi,t,L,.15);t+=Q.multi?L*.95:L;});return t;}
+function playDegreeSeq(t){const b=bus(),L=Q.multi?Math.min(S.noteLen,.9):S.noteLen;Q.items.forEach(it=>{tone(b,it.midi,t,L,SOLO);t+=Q.multi?L*.95:L;});return t;}
 function playDegree(withCad){
   ac();stopAll();ensureDrone(Q.key);let t=now()+.12;
   if(withCad) t=playVoicings(cadenceVs(Q.key,Q.ton),t,S.cadLen)+.5;
@@ -1024,7 +1027,7 @@ function playDegree(withCad){
 }
 function resolvePath(pos,ton){const sc=SCALE[ton];if(pos===0)return[0];if(pos>=6){const up=sc.filter(x=>x>pos);return[pos,...up,12];}const dn=sc.filter(x=>x<pos).reverse();return[pos,...dn];}
 function resolveNotes(b,t,base,pos,ton){const path=resolvePath(pos,ton);
-  path.forEach((p,i)=>{const first=i===0,last=i===path.length-1,L=first&&!last?1.25:last?1.2:.42;tone(b,base+p,t,L,first?.16:.14);t+=L;});return t;}
+  path.forEach((p,i)=>{const first=i===0,last=i===path.length-1,L=first&&!last?1.25:last?1.2:.42;tone(b,base+p,t,L,first?SOLO*1.05:SOLO*.92);t+=L;});return t;}
 function playResolve(){ac();stopAll();const b=bus();const it=Q.multi?Q.items[Q.items.length-1]:Q,pos=Q.multi?it.pos:Q.target,base=it.midi-pos;
   const t=resolveNotes(b,now()+.08,base,pos,Q.ton);sounding(t-now());}
 function answerDegree(p){
@@ -1056,7 +1059,7 @@ function gradeDegreeSeq(){
     Q.items.map((it,i)=>{const a=Q.answers[i];return a===it.pos?`<button class="link" data-act="dnote" data-i="${i}">${DEG[it.pos]}</button>`
       :`<button class="link" style="color:var(--orange)" data-act="dnote" data-i="${i}" title="You chose ${DEG[a]}">${DEG[a]} → ${DEG[it.pos]}</button>`;}).join('  ')+`</span></div>`;
 }
-function playDegreeNote(p,midi){ac();stopAll();if(midi!=null){const b=bus();tone(b,midi,now()+.05,S.noteLen,.15);sounding(S.noteLen);return;}const base=Q?Q.midi-Q.target:tonicBase(S.key==='random'?0:+S.key);const b=bus();tone(b,base+ +p,now()+.05,S.noteLen,.15);sounding(S.noteLen);}
+function playDegreeNote(p,midi){ac();stopAll();if(midi!=null){const b=bus();tone(b,midi,now()+.05,S.noteLen,SOLO);sounding(S.noteLen);return;}const base=Q?Q.midi-Q.target:tonicBase(S.key==='random'?0:+S.key);const b=bus();tone(b,base+ +p,now()+.05,S.noteLen,SOLO);sounding(S.noteLen);}
 
 /* ================= Intervals ================= */
 function newInterval(){
@@ -1069,7 +1072,7 @@ function newInterval(){
 const intSecond=p=>Q.dir==='down'?Q.root-(+p||12):Q.root+(+p||12);
 function playInterval(a,b,dir){
   ac();stopAll();stopDrone();const bs=bus();let t=now()+.1;
-  if(dir==='harm'){tone(bs,a,t,1.5,.13);tone(bs,b,t,1.5,.13);t+=1.6;}else{tone(bs,a,t,.85,.14);tone(bs,b,t+.8,1.1,.14);t+=1.95;}
+  if(dir==='harm'){tone(bs,a,t,1.5,SOLO*.75);tone(bs,b,t,1.5,SOLO*.75);t+=1.6;}else{tone(bs,a,t,.85,SOLO);tone(bs,b,t+.8,1.1,SOLO);t+=1.95;}
   sounding(t-now());return t-now();
 }
 function answerInterval(p){
@@ -1113,7 +1116,7 @@ function newSing(){
 function playSingKey(){if(!Q)return 0;ac();stopAll();if(S.singDrone)ensureDrone(Q.key);else stopDrone();
   const t=S.cadence?playVoicings(cadenceVs(Q.key,Q.ton),now()+.12,S.cadLen):(()=>{const b=bus();tone(b,tonicBase(Q.key),now()+.1,1.2,.15);return now()+1.3;})();
   sounding(t-now()+.25);return t-now();}
-function playSingNote(){if(!Q)return;ac();stopAll();const b=bus(),m=tonicBase(Q.key)+Q.target;tone(b,m,now()+.05,1.4,.16);sounding(1.7);Q.helped=true;}
+function playSingNote(){if(!Q)return;ac();stopAll();const b=bus(),m=tonicBase(Q.key)+Q.target;tone(b,m,now()+.05,1.4,SOLO);sounding(1.7);Q.helped=true;}
 async function startSing(){
   if(!(await micStart())){setKeyName('');showResult('',null);setPrompt('Microphone is off');
     $('#feedback').innerHTML=fbLine(false,'Sing mode needs the microphone.','Allow it for this app in your phone’s settings, then tap ▶ again.').replace('fb-feel','fb-feel" style="display:block');
