@@ -76,7 +76,11 @@ to my home screen as an installable PWA with offline support.
   compressors add automatic make-up gain, so a low threshold boosts then crushes the sound
   (audible pumping/saturation; this happened once). No detuned unison oscillators (they
   beat: a single glass note swung 9 dB); the drone is tonic + fifth only, so it doesn't
-  double chord tones. Chords sit around middle C (bass the octave below, always under the
+  double chord tones. Glass and sine are struck-then-fading (not sustained pads) with energy
+  in the overtones and a 180 Hz high-pass per voice: steady, fundamental-heavy tones made
+  phone speakers distort at high volume while the grand piano didn't. Keep their profile
+  close to the piano's (avg power, crest factor ~15 dB, ~-11 dB decay in the first second).
+  Chords sit around middle C (bass the octave below, always under the
   chord), reverb is light, block chords roll bottom to top ~22 ms per note, and Chords in a
   key has "Notes, then together" playback. Measure with an OfflineAudioContext render:
   compare against a render with the limiter neutralized (threshold 0, ratio 1, reverb off)

@@ -728,13 +728,17 @@ function tone(b,m,t,dur,vel){
   if(kind==='piano'){
     const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=.4; lp.frequency.setValueAtTime(Math.min(9000,f*9),t); lp.frequency.setTargetAtTime(Math.max(500,f*2.6),t,.45); lp.connect(g); dest=lp;
     add('triangle',f,1); add('sine',f*2,.22); add('sawtooth',f,.05,5);
-  } else if(kind==='sine'){
-    add('sine',f,1); add('sine',f*2,.24); add('sine',f*3,.09);
-    const l=ctx.createOscillator(); l.frequency.value=5.3; const lg=ctx.createGain(); lg.gain.value=f*.0012; l.connect(lg); oscs.forEach(o=>lg.connect(o.frequency)); oscs.push(l);
-    atk=.02; sus=.62; tau=.9; rel=.16; scale=.85;
   } else {
-    add('sine',f,1); add('sine',f*2,.3); add('sine',f*3,.13); add('sine',f*4,.05,4);
-    atk=.045; sus=.55; tau=1.1; rel=.35; scale=.72;
+    // Glass and sine: struck, then fading (like the piano), with energy in the overtones rather than
+    // the fundamental. Steady, fundamental-heavy tones are what make small phone speakers distort.
+    const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=180; hp.Q.value=.7; hp.connect(g); dest=hp;
+    if(kind==='sine'){
+      add('sine',f,1); add('sine',f*2,.42); add('sine',f*3,.2); add('sine',f*4,.08);
+      atk=.012; sus=.14; tau=.5; rel=.18; scale=.8;
+    } else {
+      add('sine',f,1); add('sine',f*2,.55); add('sine',f*3,.3); add('sine',f*4,.16); add('sine',f*5,.08);
+      atk=.018; sus=.12; tau=.55; rel=.4; scale=.62;
+    }
   }
   const v=vel*scale*LOUD;
   g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(v,t+atk);
